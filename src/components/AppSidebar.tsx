@@ -53,9 +53,11 @@ const navigationGroups = [
   {
     label: "Investment Approval",
     items: [
-      { title: "Approval Queue", url: "/dashboard/approval/queue", icon: CheckCircle },
-      { title: "Committee Review", url: "/dashboard/approval/committee", icon: Users },
-      { title: "Final Decisions", url: "/dashboard/approval/decisions", icon: Gavel },
+      { title: "FIM Preparation", url: "/dashboard/approval/fim", icon: FileText },
+      { title: "InvestCo Review", url: "/dashboard/approval/investco", icon: Users },
+      { title: "BRIC Review", url: "/dashboard/approval/bric", icon: FileCheck },
+      { title: "Board Approval", url: "/dashboard/approval/board", icon: Gavel },
+      { title: "Approval Tracking", url: "/dashboard/approval/tracking", icon: Activity },
     ],
   },
   {

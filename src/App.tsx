@@ -14,6 +14,11 @@ import EIM from "./pages/dashboard/pre-screening/EIM";
 import DivisionalReview from "./pages/dashboard/pre-screening/DivisionalReview";
 import RiskAssessment from "./pages/dashboard/pre-screening/RiskAssessment";
 import SubInvestCo from "./pages/dashboard/pre-screening/SubInvestCo";
+import FIM from "./pages/dashboard/approval/FIM";
+import InvestCo from "./pages/dashboard/approval/InvestCo";
+import BRIC from "./pages/dashboard/approval/BRIC";
+import Board from "./pages/dashboard/approval/Board";
+import Tracking from "./pages/dashboard/approval/Tracking";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,12 +41,11 @@ const App = () => (
             <Route path="pre-screening/review" element={<DivisionalReview />} />
             <Route path="pre-screening/risk" element={<RiskAssessment />} />
             <Route path="pre-screening/sub-investco" element={<SubInvestCo />} />
-            <Route path="review/initial" element={<Overview />} />
-            <Route path="documents" element={<Overview />} />
-            <Route path="credit-assessment" element={<Overview />} />
-            <Route path="approval/queue" element={<Overview />} />
-            <Route path="approval/committee" element={<Overview />} />
-            <Route path="approval/decisions" element={<Overview />} />
+            <Route path="approval/fim" element={<FIM />} />
+            <Route path="approval/investco" element={<InvestCo />} />
+            <Route path="approval/bric" element={<BRIC />} />
+            <Route path="approval/board" element={<Board />} />
+            <Route path="approval/tracking" element={<Tracking />} />
             <Route path="legal" element={<Overview />} />
             <Route path="compliance" element={<Overview />} />
             <Route path="disbursement/prep" element={<Overview />} />

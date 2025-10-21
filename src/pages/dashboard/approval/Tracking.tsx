@@ -14,7 +14,7 @@ const Tracking = () => {
         { name: "BRIC", status: "completed", date: "2025-10-28" },
         { name: "Board", status: "completed", date: "2025-11-05" },
       ],
-      currentStage: 4,
+      currentStage: 3,
     },
     {
       id: 2,

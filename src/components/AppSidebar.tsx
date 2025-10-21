@@ -12,9 +12,9 @@ import {
   DollarSign,
   Activity,
   PieChart,
-  Settings,
   UserCog,
-  ClipboardList
+  ClipboardList,
+  Bell
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -82,8 +82,9 @@ const navigationGroups = [
     label: "System Administration",
     items: [
       { title: "User Management", url: "/dashboard/admin/users", icon: UserCog },
-      { title: "System Settings", url: "/dashboard/admin/settings", icon: Settings },
-      { title: "Audit Logs", url: "/dashboard/admin/audit", icon: ClipboardList },
+      { title: "Role Permissions", url: "/dashboard/admin/roles", icon: Shield },
+      { title: "Notifications", url: "/dashboard/admin/notifications", icon: Bell },
+      { title: "Audit Logs", url: "/dashboard/admin/logs", icon: ClipboardList },
     ],
   },
 ];

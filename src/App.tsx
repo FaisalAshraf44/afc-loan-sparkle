@@ -6,6 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Overview from "./pages/dashboard/Overview";
+import Users from "./pages/dashboard/admin/Users";
+import Roles from "./pages/dashboard/admin/Roles";
+import Notifications from "./pages/dashboard/admin/Notifications";
+import Logs from "./pages/dashboard/admin/Logs";
 import CRM from "./pages/dashboard/origination/CRM";
 import NDA from "./pages/dashboard/origination/NDA";
 import Onboarding from "./pages/dashboard/origination/Onboarding";
@@ -62,9 +66,10 @@ const App = () => (
             <Route path="disbursement/treasury" element={<Treasury />} />
             <Route path="disbursement/portfolio" element={<Portfolio />} />
             <Route path="disbursement/reports" element={<Reports />} />
-            <Route path="admin/users" element={<Overview />} />
-            <Route path="admin/settings" element={<Overview />} />
-            <Route path="admin/audit" element={<Overview />} />
+            <Route path="admin/users" element={<Users />} />
+            <Route path="admin/roles" element={<Roles />} />
+            <Route path="admin/notifications" element={<Notifications />} />
+            <Route path="admin/logs" element={<Logs />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

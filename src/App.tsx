@@ -23,6 +23,10 @@ import CPTracker from "./pages/dashboard/pre-disbursement/CPTracker";
 import Repository from "./pages/dashboard/pre-disbursement/Repository";
 import Legal from "./pages/dashboard/pre-disbursement/Legal";
 import ClosingMemo from "./pages/dashboard/pre-disbursement/ClosingMemo";
+import Process from "./pages/dashboard/disbursement/Process";
+import Treasury from "./pages/dashboard/disbursement/Treasury";
+import Portfolio from "./pages/dashboard/disbursement/Portfolio";
+import Reports from "./pages/dashboard/disbursement/Reports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,9 +58,10 @@ const App = () => (
             <Route path="pre-disbursement/repository" element={<Repository />} />
             <Route path="pre-disbursement/legal" element={<Legal />} />
             <Route path="pre-disbursement/closing-memo" element={<ClosingMemo />} />
-            <Route path="loans/active" element={<Overview />} />
-            <Route path="payments" element={<Overview />} />
-            <Route path="reports" element={<Overview />} />
+            <Route path="disbursement/process" element={<Process />} />
+            <Route path="disbursement/treasury" element={<Treasury />} />
+            <Route path="disbursement/portfolio" element={<Portfolio />} />
+            <Route path="disbursement/reports" element={<Reports />} />
             <Route path="admin/users" element={<Overview />} />
             <Route path="admin/settings" element={<Overview />} />
             <Route path="admin/audit" element={<Overview />} />

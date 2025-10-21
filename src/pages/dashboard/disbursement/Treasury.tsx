@@ -1,0 +1,129 @@
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DollarSign, Download, CheckCircle, Clock } from "lucide-react";
+
+const fundReleases = [
+  {
+    id: "FR-001",
+    client: "Tech Innovations Ltd",
+    amount: "$2,500,000",
+    account: "****1234",
+    scheduleDate: "2024-01-20",
+    status: "Approved",
+    treasury: "Ready for Release",
+  },
+  {
+    id: "FR-002",
+    client: "Green Energy Corp",
+    amount: "$1,800,000",
+    account: "****5678",
+    scheduleDate: "2024-01-22",
+    status: "In Progress",
+    treasury: "Pending Verification",
+  },
+  {
+    id: "FR-003",
+    client: "Retail Ventures LLC",
+    amount: "$950,000",
+    account: "****9012",
+    scheduleDate: "2024-01-18",
+    status: "Completed",
+    treasury: "Funds Released",
+  },
+];
+
+const getStatusBadge = (status: string) => {
+  const variants: Record<string, "default" | "secondary" | "outline"> = {
+    "Approved": "default",
+    "In Progress": "secondary",
+    "Completed": "outline",
+  };
+  
+  return <Badge variant={variants[status] || "outline"}>{status}</Badge>;
+};
+
+export default function Treasury() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Treasury Execution</h1>
+        <p className="text-muted-foreground mt-2">
+          Fund release workflow and execution tracking
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="p-6">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+            <CheckCircle className="h-4 w-4" />
+            Ready for Release
+          </div>
+          <div className="text-2xl font-bold">$2.5M</div>
+        </Card>
+        <Card className="p-6">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+            <Clock className="h-4 w-4" />
+            Pending Verification
+          </div>
+          <div className="text-2xl font-bold">$1.8M</div>
+        </Card>
+        <Card className="p-6">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+            <DollarSign className="h-4 w-4" />
+            Released This Month
+          </div>
+          <div className="text-2xl font-bold">$950K</div>
+        </Card>
+      </div>
+
+      <Card>
+        <div className="p-6 border-b">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Fund Release Queue</h2>
+            <Button variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Export Report
+            </Button>
+          </div>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Release ID</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Amount</TableHead>
+              <TableHead>Account</TableHead>
+              <TableHead>Scheduled Date</TableHead>
+              <TableHead>Treasury Status</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {fundReleases.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell className="font-medium">{item.id}</TableCell>
+                <TableCell>{item.client}</TableCell>
+                <TableCell className="font-semibold">{item.amount}</TableCell>
+                <TableCell>{item.account}</TableCell>
+                <TableCell>{item.scheduleDate}</TableCell>
+                <TableCell>{item.treasury}</TableCell>
+                <TableCell>{getStatusBadge(item.status)}</TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    {item.status === "Approved" && (
+                      <Button size="sm">Release Funds</Button>
+                    )}
+                    <Button variant="ghost" size="sm">Details</Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
+    </div>
+  );
+}

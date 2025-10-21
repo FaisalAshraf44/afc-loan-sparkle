@@ -72,9 +72,10 @@ const navigationGroups = [
   {
     label: "Disbursement & Monitoring",
     items: [
-      { title: "Active Loans", url: "/dashboard/loans/active", icon: DollarSign },
-      { title: "Payment Tracking", url: "/dashboard/payments", icon: Activity },
-      { title: "Performance Reports", url: "/dashboard/reports", icon: PieChart },
+      { title: "Disbursement Process", url: "/dashboard/disbursement/process", icon: Activity },
+      { title: "Treasury Execution", url: "/dashboard/disbursement/treasury", icon: DollarSign },
+      { title: "Portfolio Management", url: "/dashboard/disbursement/portfolio", icon: BarChart3 },
+      { title: "Reports & Analytics", url: "/dashboard/disbursement/reports", icon: PieChart },
     ],
   },
   {

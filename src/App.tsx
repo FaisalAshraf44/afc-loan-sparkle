@@ -6,6 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Overview from "./pages/dashboard/Overview";
+import CRM from "./pages/dashboard/origination/CRM";
+import NDA from "./pages/dashboard/origination/NDA";
+import Onboarding from "./pages/dashboard/origination/Onboarding";
+import IDMemo from "./pages/dashboard/origination/IDMemo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,8 +23,10 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />}>
-            <Route path="applications/new" element={<Overview />} />
-            <Route path="leads" element={<Overview />} />
+            <Route path="origination/crm" element={<CRM />} />
+            <Route path="origination/nda" element={<NDA />} />
+            <Route path="origination/onboarding" element={<Onboarding />} />
+            <Route path="origination/id-memo" element={<IDMemo />} />
             <Route path="pipeline" element={<Overview />} />
             <Route path="review/initial" element={<Overview />} />
             <Route path="documents" element={<Overview />} />

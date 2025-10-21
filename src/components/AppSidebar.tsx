@@ -1,7 +1,7 @@
 import { 
   FileText, 
   Users, 
-  TrendingUp,
+  UserPlus,
   Search,
   FileCheck,
   BarChart3,
@@ -35,9 +35,10 @@ const navigationGroups = [
   {
     label: "Deal Origination",
     items: [
-      { title: "New Applications", url: "/dashboard/applications/new", icon: FileText },
-      { title: "Lead Management", url: "/dashboard/leads", icon: Users },
-      { title: "Application Pipeline", url: "/dashboard/pipeline", icon: TrendingUp },
+      { title: "CRM & Leads", url: "/dashboard/origination/crm", icon: Users },
+      { title: "NDA Management", url: "/dashboard/origination/nda", icon: FileText },
+      { title: "Client Onboarding", url: "/dashboard/origination/onboarding", icon: UserPlus },
+      { title: "ID Memo", url: "/dashboard/origination/id-memo", icon: FileText },
     ],
   },
   {

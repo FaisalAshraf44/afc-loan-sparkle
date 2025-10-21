@@ -35,18 +35,18 @@ const fundReleases = [
 ];
 
 const getStatusBadge = (status: string) => {
-  const variants: Record<string, "default" | "secondary" | "outline"> = {
-    "Approved": "default",
-    "In Progress": "secondary",
-    "Completed": "outline",
+  const variants: Record<string, string> = {
+    "Approved": "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+    "In Progress": "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
+    "Completed": "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
   };
   
-  return <Badge variant={variants[status] || "outline"}>{status}</Badge>;
+  return <Badge className={variants[status] || "bg-muted text-muted-foreground"}>{status}</Badge>;
 };
 
 export default function Treasury() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Treasury Execution</h1>
         <p className="text-muted-foreground mt-2">
@@ -54,27 +54,30 @@ export default function Treasury() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="p-6">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <CheckCircle className="h-4 w-4" />
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="p-6 border-l-4 border-l-green-500 bg-gradient-to-br from-green-500/5 to-transparent">
+          <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400 mb-2">
+            <CheckCircle className="h-5 w-5" />
             Ready for Release
           </div>
-          <div className="text-2xl font-bold">$2.5M</div>
+          <div className="text-3xl font-bold">$2.5M</div>
+          <p className="text-sm text-muted-foreground mt-1">1 disbursement pending</p>
         </Card>
-        <Card className="p-6">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <Clock className="h-4 w-4" />
+        <Card className="p-6 border-l-4 border-l-amber-500 bg-gradient-to-br from-amber-500/5 to-transparent">
+          <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-400 mb-2">
+            <Clock className="h-5 w-5" />
             Pending Verification
           </div>
-          <div className="text-2xl font-bold">$1.8M</div>
+          <div className="text-3xl font-bold">$1.8M</div>
+          <p className="text-sm text-muted-foreground mt-1">Under review</p>
         </Card>
-        <Card className="p-6">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <DollarSign className="h-4 w-4" />
+        <Card className="p-6 border-l-4 border-l-blue-500 bg-gradient-to-br from-blue-500/5 to-transparent">
+          <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-400 mb-2">
+            <DollarSign className="h-5 w-5" />
             Released This Month
           </div>
-          <div className="text-2xl font-bold">$950K</div>
+          <div className="text-3xl font-bold">$950K</div>
+          <p className="text-sm text-muted-foreground mt-1">1 completed</p>
         </Card>
       </div>
 

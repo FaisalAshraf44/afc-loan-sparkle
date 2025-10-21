@@ -48,24 +48,24 @@ const portfolioProjects = [
 ];
 
 const getPerformanceBadge = (performance: string) => {
-  const variants: Record<string, "default" | "secondary" | "destructive"> = {
-    "On Track": "default",
-    "Needs Attention": "secondary",
-    "At Risk": "destructive",
+  const variants: Record<string, string> = {
+    "On Track": "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+    "Needs Attention": "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
+    "At Risk": "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
   };
   
-  return <Badge variant={variants[performance] || "outline"}>{performance}</Badge>;
+  return <Badge className={variants[performance] || "bg-muted text-muted-foreground"}>{performance}</Badge>;
 };
 
 const getHealthScoreColor = (score: number) => {
-  if (score >= 85) return "text-success";
-  if (score >= 70) return "text-warning";
-  return "text-destructive";
+  if (score >= 85) return "text-green-600 dark:text-green-400";
+  if (score >= 70) return "text-amber-600 dark:text-amber-400";
+  return "text-red-600 dark:text-red-400";
 };
 
 export default function Portfolio() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Portfolio Management</h1>
         <p className="text-muted-foreground mt-2">
@@ -73,7 +73,7 @@ export default function Portfolio() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-4">
         <Card className="p-6">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
             <Activity className="h-4 w-4" />
@@ -132,9 +132,20 @@ export default function Portfolio() {
                 <TableCell>{project.disbursedDate}</TableCell>
                 <TableCell>{project.maturityDate}</TableCell>
                 <TableCell>
-                  <span className={`font-semibold ${getHealthScoreColor(project.healthScore)}`}>
-                    {project.healthScore}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 max-w-[100px] h-2 bg-secondary rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full ${
+                          project.healthScore >= 85 ? 'bg-green-500' :
+                          project.healthScore >= 70 ? 'bg-amber-500' : 'bg-red-500'
+                        }`}
+                        style={{ width: `${project.healthScore}%` }}
+                      />
+                    </div>
+                    <span className={`font-semibold text-sm ${getHealthScoreColor(project.healthScore)}`}>
+                      {project.healthScore}
+                    </span>
+                  </div>
                 </TableCell>
                 <TableCell>{getPerformanceBadge(project.performance)}</TableCell>
                 <TableCell>

@@ -18,19 +18,19 @@ const sectorDistribution = [
 ];
 
 const getStatusBadge = (status: string) => {
-  const variants: Record<string, "default" | "secondary" | "outline"> = {
-    "Completed": "default",
-    "In Progress": "secondary",
-    "Approved": "outline",
-    "Active": "default",
+  const variants: Record<string, string> = {
+    "Completed": "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
+    "In Progress": "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
+    "Approved": "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+    "Active": "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
   };
   
-  return <Badge variant={variants[status] || "outline"}>{status}</Badge>;
+  return <Badge className={variants[status] || "bg-muted text-muted-foreground"}>{status}</Badge>;
 };
 
 export default function Reports() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Reports & Analytics</h1>
         <p className="text-muted-foreground mt-2">
@@ -38,37 +38,37 @@ export default function Reports() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="p-6">
+      <div className="grid gap-6 md:grid-cols-4">
+        <Card className="p-6 border-l-4 border-l-blue-500">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <Activity className="h-4 w-4" />
+            <Activity className="h-5 w-5 text-blue-600" />
             Total Disbursements
           </div>
-          <div className="text-2xl font-bold">$15.55M</div>
-          <p className="text-xs text-success mt-1">↑ 12% from last quarter</p>
+          <div className="text-3xl font-bold">$15.55M</div>
+          <p className="text-xs text-green-600 dark:text-green-400 mt-1">↑ 12% from last quarter</p>
         </Card>
-        <Card className="p-6">
+        <Card className="p-6 border-l-4 border-l-purple-500">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <BarChart3 className="h-4 w-4" />
+            <BarChart3 className="h-5 w-5 text-purple-600" />
             Active Loans
           </div>
-          <div className="text-2xl font-bold">23</div>
+          <div className="text-3xl font-bold">23</div>
           <p className="text-xs text-muted-foreground mt-1">Across 4 sectors</p>
         </Card>
-        <Card className="p-6">
+        <Card className="p-6 border-l-4 border-l-green-500">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <TrendingUp className="h-4 w-4" />
+            <TrendingUp className="h-5 w-5 text-green-600" />
             Avg Processing Time
           </div>
-          <div className="text-2xl font-bold">14 days</div>
-          <p className="text-xs text-success mt-1">↓ 3 days from last month</p>
+          <div className="text-3xl font-bold">14 days</div>
+          <p className="text-xs text-green-600 dark:text-green-400 mt-1">↓ 3 days from last month</p>
         </Card>
-        <Card className="p-6">
+        <Card className="p-6 border-l-4 border-l-emerald-500">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <PieChart className="h-4 w-4" />
+            <PieChart className="h-5 w-5 text-emerald-600" />
             Success Rate
           </div>
-          <div className="text-2xl font-bold">96%</div>
+          <div className="text-3xl font-bold">96%</div>
           <p className="text-xs text-muted-foreground mt-1">No defaults YTD</p>
         </Card>
       </div>
@@ -149,18 +149,18 @@ export default function Reports() {
         </Card>
       </div>
 
-      <Card className="p-6">
+      <Card className="p-6 bg-gradient-to-br from-primary/5 to-transparent">
         <h3 className="text-lg font-semibold mb-4">Performance Insights</h3>
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="p-4 bg-secondary/50 rounded-lg">
+          <div className="p-5 bg-gradient-to-br from-green-500/10 to-transparent border border-green-500/20 rounded-lg">
             <p className="text-sm text-muted-foreground">Best Performing Sector</p>
             <p className="text-2xl font-bold mt-1">Technology</p>
-            <p className="text-sm text-success mt-1">35% of portfolio</p>
+            <p className="text-sm text-green-600 dark:text-green-400 mt-1">35% of portfolio</p>
           </div>
-          <div className="p-4 bg-secondary/50 rounded-lg">
+          <div className="p-5 bg-gradient-to-br from-blue-500/10 to-transparent border border-blue-500/20 rounded-lg">
             <p className="text-sm text-muted-foreground">Fastest Approval Time</p>
             <p className="text-2xl font-bold mt-1">9 days</p>
-            <p className="text-sm text-success mt-1">Achieved in Q1 2024</p>
+            <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">Achieved in Q1 2024</p>
           </div>
         </div>
       </Card>

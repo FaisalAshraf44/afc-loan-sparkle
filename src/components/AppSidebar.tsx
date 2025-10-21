@@ -63,9 +63,10 @@ const navigationGroups = [
   {
     label: "Pre-Disbursement",
     items: [
-      { title: "Legal Documentation", url: "/dashboard/legal", icon: FileOutput },
-      { title: "Compliance Checks", url: "/dashboard/compliance", icon: Shield },
-      { title: "Disbursement Prep", url: "/dashboard/disbursement/prep", icon: ClipboardList },
+      { title: "CP Tracker", url: "/dashboard/pre-disbursement/cp-tracker", icon: ClipboardList },
+      { title: "Document Repository", url: "/dashboard/pre-disbursement/repository", icon: FileOutput },
+      { title: "Legal Review", url: "/dashboard/pre-disbursement/legal", icon: Shield },
+      { title: "Closing Memo", url: "/dashboard/pre-disbursement/closing-memo", icon: FileCheck },
     ],
   },
   {

@@ -19,6 +19,10 @@ import InvestCo from "./pages/dashboard/approval/InvestCo";
 import BRIC from "./pages/dashboard/approval/BRIC";
 import Board from "./pages/dashboard/approval/Board";
 import Tracking from "./pages/dashboard/approval/Tracking";
+import CPTracker from "./pages/dashboard/pre-disbursement/CPTracker";
+import Repository from "./pages/dashboard/pre-disbursement/Repository";
+import Legal from "./pages/dashboard/pre-disbursement/Legal";
+import ClosingMemo from "./pages/dashboard/pre-disbursement/ClosingMemo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,9 +50,10 @@ const App = () => (
             <Route path="approval/bric" element={<BRIC />} />
             <Route path="approval/board" element={<Board />} />
             <Route path="approval/tracking" element={<Tracking />} />
-            <Route path="legal" element={<Overview />} />
-            <Route path="compliance" element={<Overview />} />
-            <Route path="disbursement/prep" element={<Overview />} />
+            <Route path="pre-disbursement/cp-tracker" element={<CPTracker />} />
+            <Route path="pre-disbursement/repository" element={<Repository />} />
+            <Route path="pre-disbursement/legal" element={<Legal />} />
+            <Route path="pre-disbursement/closing-memo" element={<ClosingMemo />} />
             <Route path="loans/active" element={<Overview />} />
             <Route path="payments" element={<Overview />} />
             <Route path="reports" element={<Overview />} />

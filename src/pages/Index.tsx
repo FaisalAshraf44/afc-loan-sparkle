@@ -2,8 +2,10 @@ import { StatsCard } from "@/components/StatsCard";
 import { LoanCard, LoanStatus } from "@/components/LoanCard";
 import { WorkflowStages } from "@/components/WorkflowStages";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, DollarSign, CheckCircle, Clock } from "lucide-react";
+import { FileText, DollarSign, CheckCircle, Clock, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const mockLoans = [
   {
@@ -57,6 +59,8 @@ const mockLoans = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
+  
   const filterByStatus = (status?: LoanStatus) => {
     if (!status) return mockLoans;
     return mockLoans.filter((loan) => loan.status === status);
@@ -67,12 +71,20 @@ const Index = () => {
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            AFC Loan Workflow
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Manage and track loan applications efficiently
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                AFC Loan Workflow
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Manage and track loan applications efficiently
+              </p>
+            </div>
+            <Button onClick={() => navigate("/dashboard")} size="lg">
+              Go to Dashboard
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </header>
 

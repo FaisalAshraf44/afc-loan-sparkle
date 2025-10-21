@@ -10,6 +10,10 @@ import CRM from "./pages/dashboard/origination/CRM";
 import NDA from "./pages/dashboard/origination/NDA";
 import Onboarding from "./pages/dashboard/origination/Onboarding";
 import IDMemo from "./pages/dashboard/origination/IDMemo";
+import EIM from "./pages/dashboard/pre-screening/EIM";
+import DivisionalReview from "./pages/dashboard/pre-screening/DivisionalReview";
+import RiskAssessment from "./pages/dashboard/pre-screening/RiskAssessment";
+import SubInvestCo from "./pages/dashboard/pre-screening/SubInvestCo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +32,10 @@ const App = () => (
             <Route path="origination/onboarding" element={<Onboarding />} />
             <Route path="origination/id-memo" element={<IDMemo />} />
             <Route path="pipeline" element={<Overview />} />
+            <Route path="pre-screening/eim" element={<EIM />} />
+            <Route path="pre-screening/review" element={<DivisionalReview />} />
+            <Route path="pre-screening/risk" element={<RiskAssessment />} />
+            <Route path="pre-screening/sub-investco" element={<SubInvestCo />} />
             <Route path="review/initial" element={<Overview />} />
             <Route path="documents" element={<Overview />} />
             <Route path="credit-assessment" element={<Overview />} />

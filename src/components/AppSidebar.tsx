@@ -44,9 +44,10 @@ const navigationGroups = [
   {
     label: "Investment Pre-Screening",
     items: [
-      { title: "Initial Review", url: "/dashboard/review/initial", icon: Search },
-      { title: "Document Verification", url: "/dashboard/documents", icon: FileCheck },
-      { title: "Credit Assessment", url: "/dashboard/credit-assessment", icon: BarChart3 },
+      { title: "EIM Drafting", url: "/dashboard/pre-screening/eim", icon: FileText },
+      { title: "Divisional Review", url: "/dashboard/pre-screening/review", icon: Search },
+      { title: "Risk Assessment", url: "/dashboard/pre-screening/risk", icon: BarChart3 },
+      { title: "Sub-InvestCo Meeting", url: "/dashboard/pre-screening/sub-investco", icon: Users },
     ],
   },
   {

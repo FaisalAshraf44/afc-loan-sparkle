@@ -1,8 +1,15 @@
+import { Outlet, useLocation } from "react-router-dom";
+import { 
+  Bell, 
+  User, 
+  FileText, 
+  CheckCircle, 
+  Activity 
+} from "lucide-react";
+
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Bell, User, FileText, CheckCircle, Activity } from "lucide-react";
 
 const Dashboard = () => {
   const location = useLocation();

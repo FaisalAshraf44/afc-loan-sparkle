@@ -116,47 +116,6 @@ const FIM = () => {
           </CardContent>
         </Card>
 
-        {/* Board Approval */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Board Approval & Pre-Disbursement Conditions</CardTitle>
-            <CardDescription>Review FIM and specify conditions before disbursement</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="conditions">Pre-Disbursement Conditions</Label>
-              <Textarea
-                id="conditions"
-                placeholder="List all conditions that must be fulfilled before disbursement (e.g., legal documentation, compliance requirements, final approvals)..."
-                rows={6}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button 
-                variant="outline"
-                onClick={() => {
-                  toast({
-                    title: "Revision Requested",
-                    description: "FIM has been sent back for revisions. Transaction team has been notified.",
-                  });
-                }}
-              >
-                Request Revision
-              </Button>
-              <Button
-                onClick={() => {
-                  toast({
-                    title: "FIM Approved by Board",
-                    description: "Pre-disbursement team and Treasury have been notified of approval and conditions.",
-                  });
-                }}
-              >
-                Approve FIM
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Actions */}
         <div className="flex justify-between">
           <div className="flex gap-2">

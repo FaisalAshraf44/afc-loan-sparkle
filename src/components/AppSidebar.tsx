@@ -73,6 +73,7 @@ const navigationGroups = [
     label: "Disbursement & Monitoring",
     items: [
       { title: "Disbursement Process", url: "/dashboard/disbursement/process", icon: Activity },
+      { title: "EXCO Approval", url: "/dashboard/disbursement/exco-approval", icon: CheckCircle },
       { title: "Treasury Execution", url: "/dashboard/disbursement/treasury", icon: DollarSign },
       { title: "Portfolio Management", url: "/dashboard/disbursement/portfolio", icon: BarChart3 },
       { title: "Reports & Analytics", url: "/dashboard/disbursement/reports", icon: PieChart },

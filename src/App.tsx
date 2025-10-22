@@ -31,6 +31,7 @@ import Process from "./pages/dashboard/disbursement/Process";
 import Treasury from "./pages/dashboard/disbursement/Treasury";
 import Portfolio from "./pages/dashboard/disbursement/Portfolio";
 import Reports from "./pages/dashboard/disbursement/Reports";
+import EXCOApproval from "./pages/dashboard/disbursement/EXCOApproval";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -63,6 +64,7 @@ const App = () => (
             <Route path="pre-disbursement/legal" element={<Legal />} />
             <Route path="pre-disbursement/closing-memo" element={<ClosingMemo />} />
             <Route path="disbursement/process" element={<Process />} />
+            <Route path="disbursement/exco-approval" element={<EXCOApproval />} />
             <Route path="disbursement/treasury" element={<Treasury />} />
             <Route path="disbursement/portfolio" element={<Portfolio />} />
             <Route path="disbursement/reports" element={<Reports />} />

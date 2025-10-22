@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { Calendar, Clock, Users, FileText, CheckCircle, XCircle } from "lucide-react";
 import {
   Dialog,
@@ -72,6 +73,8 @@ const getStatusIcon = (status: string) => {
 };
 
 const SubInvestCo = () => {
+  const { toast } = useToast();
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
@@ -194,7 +197,12 @@ const SubInvestCo = () => {
                         </div>
                         <div className="flex justify-end gap-2">
                           <Button variant="outline">Save Draft</Button>
-                          <Button>Finalize Outcome</Button>
+                          <Button onClick={() => {
+                            toast({
+                              title: "Committee Decision Shared",
+                              description: "The committee decision has been shared with the Transaction Team and Legal department.",
+                            });
+                          }}>Finalize Outcome</Button>
                         </div>
                       </div>
                     </DialogContent>

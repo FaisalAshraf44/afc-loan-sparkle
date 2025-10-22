@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
 import { Search, UserPlus, MoreVertical } from "lucide-react";
 import {
   DropdownMenu,
@@ -14,6 +15,7 @@ import {
 
 const Users = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
 
   const users = [
     { id: 1, name: "John Smith", email: "john.smith@company.com", role: "Admin", status: "Active", lastLogin: "2025-10-20" },
@@ -52,7 +54,12 @@ const Users = () => {
           <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
           <p className="text-muted-foreground mt-1">Manage internal system users and their access</p>
         </div>
-        <Button className="md:self-start">
+        <Button className="md:self-start" onClick={() => {
+          toast({
+            title: "Welcome Email Sent",
+            description: "A welcome email has been sent to the new user.",
+          });
+        }}>
           <UserPlus className="mr-2 h-4 w-4" />
           Add New User
         </Button>

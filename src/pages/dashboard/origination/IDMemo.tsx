@@ -5,9 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import { FileText, Save, Send, Download } from "lucide-react";
 
 const IDMemo = () => {
+  const { toast } = useToast();
+
   return (
     <div className="container mx-auto p-6 max-w-5xl">
       <div className="mb-6">
@@ -151,7 +154,12 @@ const IDMemo = () => {
                 <Download className="h-4 w-4 mr-2" />
                 Export PDF
               </Button>
-              <Button className="flex-1">
+              <Button className="flex-1" onClick={() => {
+                toast({
+                  title: "ID Memo Submitted",
+                  description: "The ID Memo has been submitted and the Divisional Head has been notified.",
+                });
+              }}>
                 <Send className="h-4 w-4 mr-2" />
                 Submit for Review
               </Button>

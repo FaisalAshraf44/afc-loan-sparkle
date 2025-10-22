@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Download, Upload } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { FileText, Download, Upload, Send } from "lucide-react";
 
 const eimDrafts = [
   { id: 1, company: "Tech Solutions Ltd", status: "approved", updatedAt: "2024-01-15" },
@@ -23,6 +24,7 @@ const getStatusColor = (status: string) => {
 
 const EIM = () => {
   const [selectedDraft, setSelectedDraft] = useState(eimDrafts[0]);
+  const { toast } = useToast();
 
   return (
     <div className="container mx-auto p-6">
@@ -76,7 +78,15 @@ const EIM = () => {
                   <Download className="h-4 w-4 mr-2" />
                   Export
                 </Button>
-                <Button size="sm">Save Draft</Button>
+                <Button size="sm" onClick={() => {
+                  toast({
+                    title: "EIM Submitted for Review",
+                    description: "The EIM has been submitted and the Divisional Head and Risk Team have been notified.",
+                  });
+                }}>
+                  <Send className="h-4 w-4 mr-2" />
+                  Submit for Review
+                </Button>
               </div>
             </div>
 

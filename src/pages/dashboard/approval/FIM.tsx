@@ -5,9 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import { FileText, Upload, Download, Save } from "lucide-react";
 
 const FIM = () => {
+  const { toast } = useToast();
   const [memo, setMemo] = useState({
     dealName: "Tech Corp Acquisition",
     executiveSummary: "",
@@ -131,7 +133,12 @@ const FIM = () => {
               <Save className="h-4 w-4 mr-2" />
               Save Draft
             </Button>
-            <Button>Submit for Review</Button>
+            <Button onClick={() => {
+              toast({
+                title: "FIM Submitted for InvestCo",
+                description: "The FIM has been submitted and the Secretariat has been notified.",
+              });
+            }}>Submit for Review</Button>
           </div>
         </div>
       </div>

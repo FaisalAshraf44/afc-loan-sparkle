@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
 import { Activity, TrendingUp, AlertTriangle } from "lucide-react";
 
 const portfolioProjects = [
@@ -64,6 +65,8 @@ const getHealthScoreColor = (score: number) => {
 };
 
 export default function Portfolio() {
+  const { toast } = useToast();
+
   return (
     <div className="space-y-6 p-6">
       <div>
@@ -149,7 +152,12 @@ export default function Portfolio() {
                 </TableCell>
                 <TableCell>{getPerformanceBadge(project.performance)}</TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="sm">Monitor</Button>
+                  <Button variant="ghost" size="sm" onClick={() => {
+                    toast({
+                      title: "Portfolio Team Notified",
+                      description: `Portfolio Management has been notified to monitor ${project.client}.`,
+                    });
+                  }}>Monitor</Button>
                 </TableCell>
               </TableRow>
             ))}

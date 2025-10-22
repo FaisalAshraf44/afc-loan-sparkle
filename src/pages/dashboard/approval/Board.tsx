@@ -2,9 +2,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, Clock, Users, Calendar, FileText, Download } from "lucide-react";
 
 const Board = () => {
+  const { toast } = useToast();
   const boardDecisions = [
     {
       id: 1,
@@ -157,6 +159,17 @@ const Board = () => {
                   <Download className="h-4 w-4 mr-2" />
                   Export Decision
                 </Button>
+                {decision.decision === "approved" && (
+                  <Button size="sm" onClick={() => {
+                    toast({
+                      title: "Board Approval Recorded",
+                      description: "Board approval has been recorded and all Division Heads and Treasury have been notified.",
+                    });
+                  }}>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Record Approval
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

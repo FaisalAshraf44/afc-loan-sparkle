@@ -6,9 +6,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import { FileText, Upload, Download, CheckCircle, Clock, XCircle } from "lucide-react";
 
 const BRIC = () => {
+  const { toast } = useToast();
   const [documents, setDocuments] = useState([
     {
       id: 1,
@@ -98,7 +100,12 @@ const BRIC = () => {
                 />
               </div>
               <div className="flex justify-end">
-                <Button>Upload Document</Button>
+                <Button onClick={() => {
+                  toast({
+                    title: "BRIC Memo Uploaded",
+                    description: "The BRIC Memo has been uploaded and the Secretariat and Risk team have been notified.",
+                  });
+                }}>Upload Document</Button>
               </div>
             </div>
           </DialogContent>

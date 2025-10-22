@@ -1,10 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { Shield, Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const Roles = () => {
+  const { toast } = useToast();
   const roles = [
     {
       name: "Admin",
@@ -68,7 +70,12 @@ const Roles = () => {
               <CardDescription>{role.description}</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" size="sm" className="w-full">
+              <Button variant="outline" size="sm" className="w-full" onClick={() => {
+                toast({
+                  title: "Role Change Notification Sent",
+                  description: `Users with the ${role.name} role have been notified of the permission changes.`,
+                });
+              }}>
                 Edit Role
               </Button>
             </CardContent>

@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Clock, AlertCircle, FileText } from "lucide-react";
 
 const disbursements = [
@@ -62,6 +63,8 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function Process() {
+  const { toast } = useToast();
+
   return (
     <div className="space-y-6 p-6">
       <div>
@@ -102,7 +105,12 @@ export default function Process() {
         <div className="p-6 border-b">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Disbursement Requests</h2>
-            <Button>
+            <Button onClick={() => {
+              toast({
+                title: "Disbursement Instruction Sent",
+                description: "The disbursement instruction has been sent and Treasury has been notified.",
+              });
+            }}>
               <FileText className="h-4 w-4 mr-2" />
               New Request
             </Button>

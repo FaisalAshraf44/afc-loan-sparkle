@@ -6,9 +6,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 import { FileText, Send, Save, Eye } from "lucide-react";
 
 const ClosingMemo = () => {
+  const { toast } = useToast();
   const recentMemos = [
     { id: 1, dealName: "Tech Corp Acquisition", status: "approved", date: "2025-10-15", reviewer: "Board" },
     { id: 2, dealName: "Green Energy Project", status: "pending", date: "2025-10-20", reviewer: "Unassigned" },
@@ -188,7 +190,12 @@ const ClosingMemo = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-2 pt-4">
-                <Button className="flex-1">
+                <Button className="flex-1" onClick={() => {
+                  toast({
+                    title: "Closing Memo Submitted",
+                    description: "The Closing Memo has been submitted and the EXCO Secretary has been notified.",
+                  });
+                }}>
                   <Send className="mr-2 h-4 w-4" />
                   Submit for Approval
                 </Button>

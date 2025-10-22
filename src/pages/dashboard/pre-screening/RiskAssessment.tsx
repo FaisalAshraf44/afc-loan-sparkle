@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useToast } from "@/hooks/use-toast";
 import { AlertTriangle, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
@@ -35,6 +36,7 @@ const getRiskIcon = (level: string) => {
 const RiskAssessment = () => {
   const [selectedAssessment, setSelectedAssessment] = useState(assessments[0]);
   const [selectedRisk, setSelectedRisk] = useState("medium");
+  const { toast } = useToast();
 
   return (
     <div className="container mx-auto p-6">
@@ -94,7 +96,12 @@ const RiskAssessment = () => {
                   </span>
                 </div>
               </div>
-              <Button>Save Assessment</Button>
+              <Button onClick={() => {
+                toast({
+                  title: "Risk Report Submitted",
+                  description: "The Risk Report has been submitted and the Secretariat and Transaction Team have been notified.",
+                });
+              }}>Save Assessment</Button>
             </div>
 
             <div className="space-y-6">

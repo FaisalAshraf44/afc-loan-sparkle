@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import { Search, Plus, FileText, Upload, Download, CheckCircle, Clock } from "lucide-react";
 
 interface NDA {
@@ -50,6 +51,7 @@ const mockNDAs: NDA[] = [
 const NDA = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isNewNDAOpen, setIsNewNDAOpen] = useState(false);
+  const { toast } = useToast();
 
   const getStatusColor = (status: NDA["status"]) => {
     switch (status) {
@@ -123,7 +125,13 @@ const NDA = () => {
                   Click to upload NDA document or drag and drop
                 </p>
               </div>
-              <Button className="w-full" onClick={() => setIsNewNDAOpen(false)}>
+              <Button className="w-full" onClick={() => {
+                setIsNewNDAOpen(false);
+                toast({
+                  title: "NDA Sent Successfully",
+                  description: "The NDA has been emailed to the client for signature.",
+                });
+              }}>
                 Send NDA
               </Button>
             </div>
@@ -201,7 +209,12 @@ const NDA = () => {
                     Download
                   </Button>
                   {nda.status === "pending" && (
-                    <Button variant="outline" className="flex-1">
+                    <Button variant="outline" className="flex-1" onClick={() => {
+                      toast({
+                        title: "Reminder Sent",
+                        description: `A reminder email has been sent to ${nda.clientName}.`,
+                      });
+                    }}>
                       Send Reminder
                     </Button>
                   )}

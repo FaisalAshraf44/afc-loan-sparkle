@@ -8,335 +8,666 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Send, Save, Eye, CheckCircle2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { 
+  FileText, 
+  Download, 
+  Send, 
+  Save, 
+  CheckCircle2, 
+  Upload, 
+  ExternalLink,
+  Building2,
+  Scale,
+  ShieldCheck,
+  Landmark,
+  FileCheck,
+  Leaf
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 const ClosingMemo = () => {
   const { toast } = useToast();
-  const [selectedFIM, setSelectedFIM] = useState<number | null>(null);
+  const [selectedApplication, setSelectedApplication] = useState<string>("");
   
-  // List of approved FIMs with all CPs satisfied
-  const approvedFIMs = [
+  // Departmental clearances state
+  const [clearances, setClearances] = useState({
+    legal: "",
+    risk: "",
+    treasury: "",
+    corporate: "",
+    environmental: ""
+  });
+
+  // List of approved applications with all CPs satisfied
+  const applications = [
     { 
-      id: 1, 
-      dealName: "Tech Corp Acquisition", 
-      dealValue: 5000000,
+      id: "AFC-2025-001", 
+      name: "Tech Corp Acquisition", 
+      code: "TCA-001",
       borrower: "Tech Corp Ltd",
-      approvalDate: "2025-10-15", 
-      approvedBy: "Board",
-      cpStatus: "all-complete",
-      cpNotes: "All conditions precedent have been satisfied",
-      legalStatus: "approved",
-      legalComments: "All legal documentation complete and reviewed"
+      division: "Private Equity",
+      facilityType: "Term Loan",
+      approvedAmount: 5000000,
+      approvalLevel: "Board",
+      approvalDate: "2025-10-15",
+      totalCPs: 12,
+      completedCPs: 12,
+      deferredCPs: 0
     },
     { 
-      id: 2, 
-      dealName: "Green Energy Project", 
-      dealValue: 8500000,
+      id: "AFC-2025-002", 
+      name: "Green Energy Project", 
+      code: "GEP-002",
       borrower: "GreenTech Solutions",
-      approvalDate: "2025-10-10", 
-      approvedBy: "Board",
-      cpStatus: "all-complete",
-      cpNotes: "Environmental permits received, all conditions met",
-      legalStatus: "approved",
-      legalComments: "Legal due diligence complete"
+      division: "Infrastructure",
+      facilityType: "Project Finance",
+      approvedAmount: 8500000,
+      approvalLevel: "Board",
+      approvalDate: "2025-10-10",
+      totalCPs: 15,
+      completedCPs: 14,
+      deferredCPs: 1
     },
     { 
-      id: 3, 
-      dealName: "Real Estate Development", 
-      dealValue: 12000000,
+      id: "AFC-2025-003", 
+      name: "Real Estate Development", 
+      code: "RED-003",
       borrower: "Cityscape Developers",
-      approvalDate: "2025-10-08", 
-      approvedBy: "Board",
-      cpStatus: "all-complete",
-      cpNotes: "Title deeds verified, construction permits obtained",
-      legalStatus: "approved",
-      legalComments: "All agreements executed"
+      division: "Real Estate",
+      facilityType: "Senior Debt",
+      approvedAmount: 12000000,
+      approvalLevel: "BRIC",
+      approvalDate: "2025-10-08",
+      totalCPs: 18,
+      completedCPs: 18,
+      deferredCPs: 0
     },
   ];
 
-  const getStatusBadge = (status: string) => {
-    return status === "approved" ? (
-      <Badge variant="default">Approved</Badge>
-    ) : status === "rejected" ? (
-      <Badge variant="destructive">Rejected</Badge>
-    ) : (
-      <Badge variant="secondary">Pending</Badge>
-    );
+  const selectedApp = applications.find(app => app.id === selectedApplication);
+
+  // Calculate departmental clearance progress
+  const clearanceCount = Object.values(clearances).filter(val => val === "yes").length;
+  const clearanceProgress = (clearanceCount / 5) * 100;
+
+  // Handle form submission
+  const handleSubmit = () => {
+    if (!selectedApplication) {
+      toast({
+        title: "Validation Error",
+        description: "Please select an application first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Basic validation
+    const requiredFields = document.querySelectorAll('[required]');
+    let isValid = true;
+    requiredFields.forEach(field => {
+      if (!(field as HTMLInputElement).value) {
+        isValid = false;
+      }
+    });
+
+    if (!isValid) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    toast({
+      title: "Closing Memo Submitted",
+      description: "Closing memo submitted successfully to EXCO Secretary.",
+    });
   };
 
-  const selectedFIMData = approvedFIMs.find(fim => fim.id === selectedFIM);
+  const handleSaveDraft = () => {
+    toast({
+      title: "Draft Saved",
+      description: "Closing memo saved as draft.",
+    });
+  };
+
+  const handleDownloadPDF = () => {
+    toast({
+      title: "Download Complete",
+      description: "Closing memo downloaded successfully.",
+    });
+  };
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="container mx-auto p-6 max-w-5xl">
       <div className="mb-6">
-        <h2 className="text-3xl font-bold">Closing Memo</h2>
-        <p className="text-muted-foreground">Create closing memo for approved FIMs with satisfied CPs</p>
+        <h2 className="text-3xl font-bold">Closing Memo Form</h2>
+        <p className="text-muted-foreground">Final pre-disbursement clearance documentation</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Approved FIMs List */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Approved FIMs</CardTitle>
-              <CardDescription>Select a FIM to create closing memo</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {approvedFIMs.map((fim) => (
-                  <div
-                    key={fim.id}
-                    onClick={() => setSelectedFIM(fim.id)}
-                    className={`p-4 rounded-lg border cursor-pointer transition-all ${
-                      selectedFIM === fim.id 
-                        ? 'bg-primary/10 border-primary' 
-                        : 'bg-card hover:bg-accent/50'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <p className="font-semibold text-sm">{fim.dealName}</p>
-                      <Badge variant="default" className="ml-2">
-                        <CheckCircle2 className="h-3 w-3 mr-1" />
-                        Ready
-                      </Badge>
+      <div className="space-y-6">
+        {/* Section 1: Transaction Overview */}
+        <Card>
+          <CardHeader className="border-b border-primary/20">
+            <div className="flex items-center gap-2">
+              <div className="h-1 w-12 bg-primary rounded" />
+              <CardTitle>Transaction Overview</CardTitle>
+            </div>
+            <CardDescription>Select application and review deal information</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="application">Select Application *</Label>
+                <Select value={selectedApplication} onValueChange={setSelectedApplication}>
+                  <SelectTrigger id="application">
+                    <SelectValue placeholder="Select an approved application" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {applications.map((app) => (
+                      <SelectItem key={app.id} value={app.id}>
+                        {app.name} - {app.borrower} (${(app.approvedAmount / 1000000).toFixed(1)}M)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedApp && (
+                <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Deal Name</Label>
+                      <p className="font-medium">{selectedApp.name}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      {fim.borrower}
-                    </p>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">
-                        ${(fim.dealValue / 1000000).toFixed(1)}M
-                      </span>
-                      <span className="text-muted-foreground">
-                        {fim.approvalDate}
-                      </span>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Project Code</Label>
+                      <p className="font-medium">{selectedApp.code}</p>
                     </div>
-                    <div className="mt-2 pt-2 border-t">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <CheckCircle2 className="h-3 w-3 text-green-500" />
-                        All CPs Satisfied
-                      </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Borrower</Label>
+                      <p className="font-medium">{selectedApp.borrower}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Division</Label>
+                      <p className="font-medium">{selectedApp.division}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Facility Type</Label>
+                      <p className="font-medium">{selectedApp.facilityType}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Approved Amount</Label>
+                      <p className="font-medium">${selectedApp.approvedAmount.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Approval Level</Label>
+                      <Badge variant="default">{selectedApp.approvalLevel}</Badge>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Approval Date</Label>
+                      <p className="font-medium">{selectedApp.approvalDate}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Guidelines</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="text-sm space-y-2 text-muted-foreground">
-                <li>• Select an approved FIM with satisfied CPs</li>
-                <li>• Review deal information and conditions</li>
-                <li>• Verify disbursement instructions</li>
-                <li>• Submit for EXCO approval</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Form */}
-        <div className="lg:col-span-2 space-y-6">
-          {!selectedFIM ? (
+        {selectedApp && (
+          <>
+            {/* Section 2: CP Summary */}
             <Card>
-              <CardContent className="py-12 text-center">
-                <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">No FIM Selected</h3>
-                <p className="text-muted-foreground">
-                  Please select an approved FIM from the list to create a closing memo
-                </p>
+              <CardHeader className="border-b border-primary/20">
+                <div className="flex items-center gap-2">
+                  <div className="h-1 w-12 bg-primary rounded" />
+                  <CardTitle>Conditions Precedent Summary</CardTitle>
+                </div>
+                <CardDescription>Review status of all conditions precedent</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-primary/5 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-primary">{selectedApp.totalCPs}</p>
+                      <p className="text-sm text-muted-foreground">Total CPs</p>
+                    </div>
+                    <div className="bg-green-500/10 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-green-600">{selectedApp.completedCPs}</p>
+                      <p className="text-sm text-muted-foreground">Completed</p>
+                    </div>
+                    <div className="bg-amber-500/10 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-amber-600">{selectedApp.deferredCPs}</p>
+                      <p className="text-sm text-muted-foreground">Deferred/Waived</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="cp-summary">CP Summary Notes</Label>
+                    <Textarea
+                      id="cp-summary"
+                      placeholder="Provide detailed notes on CP completion status..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <Button variant="outline" asChild className="w-full">
+                    <Link to="/dashboard/pre-disbursement/cp-tracker">
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      View CP Tracker
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
-          ) : (
+
+            {/* Section 3: Departmental Clearances */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Create Closing Memo
-                </CardTitle>
-                <CardDescription>
-                  Prepare closing memo for {selectedFIMData?.dealName}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Deal Information */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold">Deal Information</h3>
-                    <Badge variant="outline">
-                      Approved: {selectedFIMData?.approvalDate}
-                    </Badge>
+              <CardHeader className="border-b border-primary/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-1 w-12 bg-primary rounded" />
+                      <CardTitle>Departmental Clearances</CardTitle>
+                    </div>
+                    <CardDescription>Obtain clearance from all required departments</CardDescription>
                   </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-primary">{clearanceCount}/5</p>
+                    <p className="text-xs text-muted-foreground">Cleared</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-sm">Overall Progress</Label>
+                      <span className="text-sm font-medium">{clearanceProgress.toFixed(0)}%</span>
+                    </div>
+                    <Progress value={clearanceProgress} className="h-2" />
+                  </div>
+
+                  {/* Legal Clearance */}
+                  <div className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Scale className="h-5 w-5 text-primary" />
+                      <h4 className="font-semibold">Legal Clearance</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="legal-status">Status *</Label>
+                        <Select value={clearances.legal} onValueChange={(val) => setClearances({...clearances, legal: val})}>
+                          <SelectTrigger id="legal-status">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="yes">Yes - Cleared</SelectItem>
+                            <SelectItem value="no">No - Pending</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="legal-doc">Upload Document</Label>
+                        <div className="flex gap-2">
+                          <Input id="legal-doc" type="file" className="flex-1" />
+                          <Button size="icon" variant="outline">
+                            <Upload className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="legal-comment">Comments</Label>
+                      <Textarea id="legal-comment" placeholder="Add any notes..." rows={2} />
+                    </div>
+                  </div>
+
+                  {/* Risk Clearance */}
+                  <div className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="h-5 w-5 text-primary" />
+                      <h4 className="font-semibold">Risk Clearance</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="risk-status">Status *</Label>
+                        <Select value={clearances.risk} onValueChange={(val) => setClearances({...clearances, risk: val})}>
+                          <SelectTrigger id="risk-status">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="yes">Yes - Cleared</SelectItem>
+                            <SelectItem value="no">No - Pending</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="risk-doc">Upload Document</Label>
+                        <div className="flex gap-2">
+                          <Input id="risk-doc" type="file" className="flex-1" />
+                          <Button size="icon" variant="outline">
+                            <Upload className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="risk-comment">Comments</Label>
+                      <Textarea id="risk-comment" placeholder="Add any notes..." rows={2} />
+                    </div>
+                  </div>
+
+                  {/* Treasury Readiness */}
+                  <div className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Landmark className="h-5 w-5 text-primary" />
+                      <h4 className="font-semibold">Treasury Readiness</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="treasury-status">Status *</Label>
+                        <Select value={clearances.treasury} onValueChange={(val) => setClearances({...clearances, treasury: val})}>
+                          <SelectTrigger id="treasury-status">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="yes">Yes - Cleared</SelectItem>
+                            <SelectItem value="no">No - Pending</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="treasury-doc">Upload Document</Label>
+                        <div className="flex gap-2">
+                          <Input id="treasury-doc" type="file" className="flex-1" />
+                          <Button size="icon" variant="outline">
+                            <Upload className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="treasury-comment">Comments</Label>
+                      <Textarea id="treasury-comment" placeholder="Add any notes..." rows={2} />
+                    </div>
+                  </div>
+
+                  {/* Corporate Secretariat */}
+                  <div className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-5 w-5 text-primary" />
+                      <h4 className="font-semibold">Corporate Secretariat Clearance</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="corporate-status">Status *</Label>
+                        <Select value={clearances.corporate} onValueChange={(val) => setClearances({...clearances, corporate: val})}>
+                          <SelectTrigger id="corporate-status">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="yes">Yes - Cleared</SelectItem>
+                            <SelectItem value="no">No - Pending</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="corporate-doc">Upload Document</Label>
+                        <div className="flex gap-2">
+                          <Input id="corporate-doc" type="file" className="flex-1" />
+                          <Button size="icon" variant="outline">
+                            <Upload className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="corporate-comment">Comments</Label>
+                      <Textarea id="corporate-comment" placeholder="Add any notes..." rows={2} />
+                    </div>
+                  </div>
+
+                  {/* E&S Clearance */}
+                  <div className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Leaf className="h-5 w-5 text-primary" />
+                      <h4 className="font-semibold">Environmental & Social (E&S) Clearance</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="environmental-status">Status *</Label>
+                        <Select value={clearances.environmental} onValueChange={(val) => setClearances({...clearances, environmental: val})}>
+                          <SelectTrigger id="environmental-status">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="yes">Yes - Cleared</SelectItem>
+                            <SelectItem value="no">No - Pending</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="environmental-doc">Upload Document</Label>
+                        <div className="flex gap-2">
+                          <Input id="environmental-doc" type="file" className="flex-1" />
+                          <Button size="icon" variant="outline">
+                            <Upload className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="environmental-comment">Comments</Label>
+                      <Textarea id="environmental-comment" placeholder="Add any notes..." rows={2} />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Section 4: Financial Details */}
+            <Card>
+              <CardHeader className="border-b border-primary/20">
+                <div className="flex items-center gap-2">
+                  <div className="h-1 w-12 bg-primary rounded" />
+                  <CardTitle>Financial Details</CardTitle>
+                </div>
+                <CardDescription>Specify disbursement and funding information</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="deal-name">Deal Name</Label>
+                      <Label htmlFor="disbursement-amount">Disbursement Amount *</Label>
                       <Input 
-                        id="deal-name" 
-                        value={selectedFIMData?.dealName}
-                        readOnly
-                        className="bg-muted"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="deal-value">Deal Value (USD)</Label>
-                      <Input 
-                        id="deal-value" 
+                        id="disbursement-amount" 
                         type="number" 
-                        value={selectedFIMData?.dealValue}
-                        readOnly
-                        className="bg-muted"
+                        placeholder="Enter amount"
+                        required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="borrower">Borrower</Label>
+                      <Label htmlFor="disbursement-currency">Disbursement Currency *</Label>
+                      <Select required>
+                        <SelectTrigger id="disbursement-currency">
+                          <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="usd">USD</SelectItem>
+                          <SelectItem value="eur">EUR</SelectItem>
+                          <SelectItem value="gbp">GBP</SelectItem>
+                          <SelectItem value="local">Local Currency</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="disbursement-date">Disbursement Date *</Label>
                       <Input 
-                        id="borrower" 
-                        value={selectedFIMData?.borrower}
+                        id="disbursement-date" 
+                        type="date" 
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="funding-source">Funding Source *</Label>
+                      <Select required>
+                        <SelectTrigger id="funding-source">
+                          <SelectValue placeholder="Select funding source" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="own-funds">Own Funds</SelectItem>
+                          <SelectItem value="syndication">Syndication</SelectItem>
+                          <SelectItem value="donor">Donor Funding</SelectItem>
+                          <SelectItem value="mixed">Mixed Funding</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bank-details">Bank / Account Details *</Label>
+                    <Textarea
+                      id="bank-details"
+                      placeholder="Bank name, account number, SWIFT code, etc."
+                      rows={3}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="treasury-notes">Treasury Notes</Label>
+                    <Textarea
+                      id="treasury-notes"
+                      placeholder="Additional treasury instructions or notes..."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Section 5: Approvals & Attachments */}
+            <Card>
+              <CardHeader className="border-b border-primary/20">
+                <div className="flex items-center gap-2">
+                  <div className="h-1 w-12 bg-primary rounded" />
+                  <CardTitle>Approvals & Attachments</CardTitle>
+                </div>
+                <CardDescription>Final sign-off and supporting documents</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="prepared-by">Prepared By</Label>
+                      <Input 
+                        id="prepared-by" 
+                        value="Current User" 
                         readOnly
                         className="bg-muted"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="closing-date">Expected Closing Date</Label>
-                      <Input id="closing-date" type="date" />
+                      <Label htmlFor="date-prepared">Date Prepared</Label>
+                      <Input 
+                        id="date-prepared" 
+                        type="date"
+                        value={new Date().toISOString().split('T')[0]}
+                        readOnly
+                        className="bg-muted"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="reviewed-by">Reviewed By</Label>
+                      <Select>
+                        <SelectTrigger id="reviewed-by">
+                          <SelectValue placeholder="Select reviewer" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="head-legal">Head of Legal</SelectItem>
+                          <SelectItem value="head-risk">Head of Risk</SelectItem>
+                          <SelectItem value="cfo">CFO</SelectItem>
+                          <SelectItem value="coo">COO</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="approved-by">Approved By</Label>
+                      <Input 
+                        id="approved-by" 
+                        value="Pending EXCO Review" 
+                        readOnly
+                        className="bg-muted"
+                      />
                     </div>
                   </div>
-                </div>
 
-              <Separator />
-
-              {/* Executive Summary */}
-              <div className="space-y-4">
-                <h3 className="font-semibold">Executive Summary</h3>
-                <div className="space-y-2">
-                  <Label htmlFor="summary">Summary</Label>
-                  <Textarea
-                    id="summary"
-                    placeholder="Provide a brief overview of the transaction..."
-                    rows={4}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Conditions Status */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Conditions Precedent Status</h3>
-                  <Badge variant="default" className="bg-green-500">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    All Complete
-                  </Badge>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cp-notes">CP Summary</Label>
-                  <Textarea
-                    id="cp-notes"
-                    value={selectedFIMData?.cpNotes}
-                    readOnly
-                    className="bg-muted"
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Legal Opinion */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Legal Opinion</h3>
-                  <Badge variant="default" className="bg-green-500">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    Approved
-                  </Badge>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="legal-comments">Legal Comments</Label>
-                  <Textarea
-                    id="legal-comments"
-                    value={selectedFIMData?.legalComments}
-                    readOnly
-                    className="bg-muted"
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Disbursement Instructions */}
-              <div className="space-y-4">
-                <h3 className="font-semibold">Disbursement Instructions</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="disbursement-amount">Disbursement Amount</Label>
-                    <Input id="disbursement-amount" type="number" placeholder="Amount" />
+                    <Label htmlFor="supporting-docs">Attach Supporting Documents</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        id="supporting-docs" 
+                        type="file" 
+                        multiple
+                        className="flex-1"
+                      />
+                      <Button size="icon" variant="outline">
+                        <Upload className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Upload signed clearance memos, legal opinions, and other supporting documents
+                    </p>
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="disbursement-date">Disbursement Date</Label>
-                    <Input id="disbursement-date" type="date" />
+                    <Label htmlFor="additional-notes">Additional Notes</Label>
+                    <Textarea
+                      id="additional-notes"
+                      placeholder="Any other relevant information..."
+                      rows={4}
+                    />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="bank-details">Bank Account Details</Label>
-                  <Textarea
-                    id="bank-details"
-                    placeholder="Beneficiary account information..."
-                    rows={3}
-                  />
+              </CardContent>
+            </Card>
+
+            {/* Action Buttons */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col md:flex-row gap-3">
+                  <Button 
+                    onClick={handleSaveDraft}
+                    variant="outline" 
+                    className="flex-1"
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Draft
+                  </Button>
+                  <Button 
+                    onClick={handleSubmit}
+                    className="flex-1"
+                  >
+                    <Send className="mr-2 h-4 w-4" />
+                    Submit for EXCO Review
+                  </Button>
+                  <Button 
+                    onClick={handleDownloadPDF}
+                    variant="secondary" 
+                    className="flex-1"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download PDF
+                  </Button>
                 </div>
-              </div>
-
-              <Separator />
-
-              {/* Approvals */}
-              <div className="space-y-4">
-                <h3 className="font-semibold">Required Approvals</h3>
-                <div className="space-y-2">
-                  <Label htmlFor="approver">Primary Approver</Label>
-                  <Select>
-                    <SelectTrigger id="approver">
-                      <SelectValue placeholder="Select approver" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ceo">CEO</SelectItem>
-                      <SelectItem value="cfo">CFO</SelectItem>
-                      <SelectItem value="board">Board Chair</SelectItem>
-                      <SelectItem value="legal">Legal Director</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-2 pt-4">
-                <Button className="flex-1" onClick={() => {
-                  toast({
-                    title: "Closing Memo Submitted",
-                    description: "The Closing Memo has been submitted and the EXCO Secretary has been notified.",
-                  });
-                }}>
-                  <Send className="mr-2 h-4 w-4" />
-                  Submit for Approval
-                </Button>
-                <Button variant="outline">
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Draft
-                </Button>
-                <Button variant="ghost">
-                  <Eye className="mr-2 h-4 w-4" />
-                  Preview
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          )}
-        </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
     </div>
   );

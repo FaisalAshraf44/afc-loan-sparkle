@@ -186,12 +186,38 @@ const BRIC = () => {
                         <Textarea
                           placeholder="Add your review comments..."
                           defaultValue={doc.reviewComments}
-                          rows={6}
+                          rows={4}
+                        />
+                      </div>
+                      <div>
+                        <Label>Pre-Disbursement Requirements</Label>
+                        <Textarea
+                          placeholder="List requirements that must be fulfilled before disbursement..."
+                          rows={4}
                         />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button variant="outline">Request Revision</Button>
-                        <Button>Approve Document</Button>
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            toast({
+                              title: "Revision Requested",
+                              description: `${doc.dealName} - Revision request sent to ${doc.uploadedBy}`,
+                            });
+                          }}
+                        >
+                          Request Revision
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            toast({
+                              title: "BRIC Document Approved",
+                              description: "Board Team members have been notified of the approval and pre-disbursement requirements.",
+                            });
+                          }}
+                        >
+                          Approve Document
+                        </Button>
                       </div>
                     </div>
                   </DialogContent>

@@ -242,6 +242,14 @@ const Index = () => {
           </Card>
         </div>
       </main>
+
+      <footer className="border-t border-border bg-card/50 backdrop-blur">
+        <div className="container mx-auto px-4 py-3 flex justify-end">
+          <p className="text-sm text-muted-foreground">
+            Developed by <span className="font-semibold text-foreground">Insyt</span>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };

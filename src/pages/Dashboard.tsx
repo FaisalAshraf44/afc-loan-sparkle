@@ -118,6 +118,15 @@ const Dashboard = () => {
               <Outlet />
             )}
           </main>
+
+          {/* Footer */}
+          <footer className="border-t border-border bg-card/50 backdrop-blur">
+            <div className="px-6 py-3 flex justify-end">
+              <p className="text-sm text-muted-foreground">
+                Developed by <span className="font-semibold text-foreground">Insyt</span>
+              </p>
+            </div>
+          </footer>
         </div>
       </div>
     </SidebarProvider>

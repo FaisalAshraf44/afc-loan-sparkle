@@ -21,10 +21,11 @@ const NotFound = () => {
       </div>
 
       <footer className="border-t border-border bg-card/50 backdrop-blur">
-        <div className="px-4 py-3 flex justify-end">
+        <div className="px-4 py-3 flex justify-end items-center gap-2">
           <p className="text-sm text-muted-foreground">
             Developed by <span className="font-semibold text-foreground">Insyt</span>
           </p>
+          <img src="/src/assets/insyt-logo.png" alt="Insyt Logo" className="h-6 w-auto" />
         </div>
       </footer>
     </div>

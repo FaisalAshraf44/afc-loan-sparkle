@@ -14,6 +14,10 @@ import CRM from "./pages/dashboard/origination/CRM";
 import NDA from "./pages/dashboard/origination/NDA";
 import Onboarding from "./pages/dashboard/origination/Onboarding";
 import IDMemo from "./pages/dashboard/origination/IDMemo";
+import TeaserReview from "./pages/dashboard/origination/TeaserReview";
+import DataRoom from "./pages/dashboard/origination/DataRoom";
+import KYCCompliance from "./pages/dashboard/origination/KYCCompliance";
+import TeamAssignment from "./pages/dashboard/origination/TeamAssignment";
 import EIM from "./pages/dashboard/pre-screening/EIM";
 import DivisionalReview from "./pages/dashboard/pre-screening/DivisionalReview";
 import RiskAssessment from "./pages/dashboard/pre-screening/RiskAssessment";
@@ -46,8 +50,12 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />}>
             <Route path="origination/crm" element={<CRM />} />
+            <Route path="origination/teaser" element={<TeaserReview />} />
             <Route path="origination/nda" element={<NDA />} />
             <Route path="origination/onboarding" element={<Onboarding />} />
+            <Route path="origination/data-room" element={<DataRoom />} />
+            <Route path="origination/kyc" element={<KYCCompliance />} />
+            <Route path="origination/team-assignment" element={<TeamAssignment />} />
             <Route path="origination/id-memo" element={<IDMemo />} />
             <Route path="pipeline" element={<Overview />} />
             <Route path="pre-screening/eim" element={<EIM />} />

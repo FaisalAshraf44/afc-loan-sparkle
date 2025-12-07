@@ -63,8 +63,12 @@ const navigationGroups = [
     department: "origination" as Department,
     items: [
       { title: "CRM & Leads", url: "/dashboard/origination/crm", icon: Users },
+      { title: "Teaser Review", url: "/dashboard/origination/teaser", icon: FileText },
       { title: "NDA Management", url: "/dashboard/origination/nda", icon: FileText },
       { title: "Client Onboarding", url: "/dashboard/origination/onboarding", icon: UserPlus },
+      { title: "Data Room Access", url: "/dashboard/origination/data-room", icon: FileOutput },
+      { title: "KYC & Compliance", url: "/dashboard/origination/kyc", icon: Shield },
+      { title: "Team Assignment", url: "/dashboard/origination/team-assignment", icon: UserCog },
       { title: "ID Memo", url: "/dashboard/origination/id-memo", icon: FileText },
     ],
   },

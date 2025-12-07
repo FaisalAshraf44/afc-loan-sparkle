@@ -119,9 +119,10 @@ const navigationGroups = [
     label: "Disbursement & Monitoring",
     department: "treasury" as Department,
     items: [
-      { title: "Disbursement Process", url: "/dashboard/disbursement/process", icon: Activity },
       { title: "EXCO Approval", url: "/dashboard/disbursement/exco-approval", icon: CheckCircle },
+      { title: "Document Repository", url: "/dashboard/pre-disbursement/repository", icon: FileOutput },
       { title: "SAP Integration", url: "/dashboard/disbursement/sap-integration", icon: Database },
+      { title: "Disbursement Process", url: "/dashboard/disbursement/process", icon: Activity },
       { title: "Treasury Execution", url: "/dashboard/disbursement/treasury", icon: DollarSign },
       { title: "Portfolio Management", url: "/dashboard/disbursement/portfolio", icon: BarChart3 },
       { title: "Reports & Analytics", url: "/dashboard/disbursement/reports", icon: PieChart },

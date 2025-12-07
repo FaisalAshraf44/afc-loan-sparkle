@@ -42,6 +42,7 @@ import Portfolio from "./pages/dashboard/disbursement/Portfolio";
 import Reports from "./pages/dashboard/disbursement/Reports";
 import EXCOApproval from "./pages/dashboard/disbursement/EXCOApproval";
 import SAPIntegration from "./pages/dashboard/disbursement/SAPIntegration";
+import InvestmentDisclosure from "./pages/dashboard/disbursement/InvestmentDisclosure";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -86,6 +87,7 @@ const App = () => (
             <Route path="disbursement/exco-approval" element={<EXCOApproval />} />
             <Route path="disbursement/sap-integration" element={<SAPIntegration />} />
             <Route path="disbursement/treasury" element={<Treasury />} />
+            <Route path="disbursement/investment-disclosure" element={<InvestmentDisclosure />} />
             <Route path="disbursement/portfolio" element={<Portfolio />} />
             <Route path="disbursement/reports" element={<Reports />} />
             <Route path="admin/users" element={<Users />} />

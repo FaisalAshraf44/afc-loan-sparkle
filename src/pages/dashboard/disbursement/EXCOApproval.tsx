@@ -20,7 +20,9 @@ import {
   Upload, 
   Send,
   Eye,
-  AlertCircle
+  AlertCircle,
+  UserCheck,
+  Landmark
 } from "lucide-react";
 
 interface Waiver {
@@ -40,8 +42,27 @@ interface ExcoMember {
   comment: string;
 }
 
+// Division to Department Head mapping
+const divisionHeads: Record<string, { name: string; title: string }> = {
+  "Financial Services": { name: "Robert Thompson", title: "Head of Financial Services" },
+  "Investments": { name: "Maria Garcia", title: "Head of Investments" },
+  "Infrastructure": { name: "James Wilson", title: "Head of Infrastructure" },
+  "SME Finance": { name: "Patricia Brown", title: "Head of SME Finance" },
+  "Private Equity": { name: "John Smith", title: "Head of Private Equity" },
+  "Real Estate": { name: "Michael Chen", title: "Head of Real Estate" },
+  "Trade Finance": { name: "Amanda Lee", title: "Head of Trade Finance" }
+};
+
+// Constant EXCO approvers for all disbursements
+const constantApprovers = [
+  { id: 1, role: "General Counsel", name: "Sarah Johnson", required: true },
+  { id: 2, role: "Chief Risk Officer", name: "Michael Chen", required: true },
+  { id: 3, role: "Chief Financial Officer", name: "David Williams", required: true },
+  { id: 4, role: "Chief Executive Officer", name: "Jennifer Martinez", required: true }
+];
+
 export default function EXCOApproval() {
-  const [selectedDeal] = useState({
+  const [selectedDeal, setSelectedDeal] = useState({
     dealName: "Tech Corp Acquisition",
     projectCode: "AFC-2025-001",
     division: "Financial Services",
@@ -72,19 +93,44 @@ export default function EXCOApproval() {
     }
   ]);
 
+  // Department Head approval - tied to the division whose disbursement is being processed
   const [deptHead, setDeptHead] = useState({
-    division: "",
-    headName: "",
-    approval: "Pending",
-    comment: ""
+    division: "Financial Services",
+    headName: divisionHeads["Financial Services"]?.name || "",
+    headTitle: divisionHeads["Financial Services"]?.title || "",
+    approval: "Pending" as "Pending" | "Approved" | "Declined",
+    comment: "",
+    approvalDate: ""
   });
 
-  const [excoMembers, setExcoMembers] = useState<ExcoMember[]>([
-    { id: 1, role: "General Counsel", name: "Sarah Johnson", status: "Approved", comment: "" },
-    { id: 2, role: "Chief Risk Officer", name: "Michael Chen", status: "Approved", comment: "" },
-    { id: 3, role: "Chief Financial Officer", name: "David Williams", status: "Pending", comment: "" },
-    { id: 4, role: "Chief Executive Officer", name: "Jennifer Martinez", status: "Pending", comment: "" }
-  ]);
+  // Update department head when division changes
+  const handleDivisionChange = (division: string) => {
+    const head = divisionHeads[division];
+    setDeptHead({
+      ...deptHead,
+      division,
+      headName: head?.name || "",
+      headTitle: head?.title || ""
+    });
+    setSelectedDeal({
+      ...selectedDeal,
+      division
+    });
+  };
+
+  // Constant EXCO approvers - always required for all disbursements
+  const [excoMembers, setExcoMembers] = useState<ExcoMember[]>(
+    constantApprovers.map(approver => ({
+      id: approver.id,
+      role: approver.role,
+      name: approver.name,
+      status: "Pending" as "Approved" | "Pending" | "Declined",
+      comment: ""
+    }))
+  );
+
+  // Track if EXCO approval is complete
+  const [excoDecisionCommunicated, setExcoDecisionCommunicated] = useState(false);
 
   const [finalDecision, setFinalDecision] = useState({
     approved: true,
@@ -137,7 +183,7 @@ export default function EXCOApproval() {
     });
   };
 
-  const handleDeptHeadApproval = () => {
+  const handleDeptHeadApproval = (status: "Approved" | "Declined") => {
     if (!deptHead.division) {
       toast({
         title: "Missing Information",
@@ -147,9 +193,15 @@ export default function EXCOApproval() {
       return;
     }
 
+    setDeptHead({
+      ...deptHead,
+      approval: status,
+      approvalDate: new Date().toISOString().split('T')[0]
+    });
+
     toast({
       title: "Success",
-      description: "Department Head approval recorded successfully."
+      description: `Department Head (${deptHead.headName}) ${status.toLowerCase()} the disbursement.`
     });
   };
 
@@ -188,7 +240,29 @@ export default function EXCOApproval() {
     if (!finalDecision.approvalDate) {
       toast({
         title: "Missing Information",
-        description: "Please select an approval date.",
+        description: "Please select a decision date.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate that all required approvals are in place
+    const allExcoApproved = excoMembers.every(m => m.status === "Approved");
+    const deptHeadApproved = deptHead.approval === "Approved";
+    
+    if (!deptHeadApproved) {
+      toast({
+        title: "Approval Required",
+        description: "Divisional Department Head approval is required before submitting the decision.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!allExcoApproved) {
+      toast({
+        title: "Approvals Incomplete",
+        description: "All EXCO member approvals (GC, CRO, CFO, CEO) are required.",
         variant: "destructive"
       });
       return;
@@ -196,14 +270,15 @@ export default function EXCOApproval() {
 
     toast({
       title: "Success",
-      description: "EXCO approval submitted successfully."
+      description: `EXCO ${finalDecision.approved ? "approved" : "rejected"} the disbursement for ${selectedDeal.dealName}.`
     });
   };
 
   const handleNotifyTeam = () => {
+    setExcoDecisionCommunicated(true);
     toast({
       title: "Success",
-      description: "Notification sent to Transaction Team."
+      description: `EXCO decision communicated to Transaction Team for ${selectedDeal.dealName}. They can now proceed with disbursement processing.`
     });
   };
 
@@ -410,154 +485,217 @@ export default function EXCOApproval() {
         </CardContent>
       </Card>
 
-      {/* Section 3: Departmental Head Approval */}
-      <Card>
+      {/* Section 3: Divisional Department Head Approval */}
+      <Card className={deptHead.approval === "Approved" ? "border-l-4 border-l-green-500" : deptHead.approval === "Declined" ? "border-l-4 border-l-red-500" : ""}>
         <CardHeader>
-          <CardTitle>Department Head Approval</CardTitle>
-          <CardDescription>Record approval from the responsible department head</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <UserCheck className="h-5 w-5 text-primary" />
+                Divisional Department Head Approval
+              </CardTitle>
+              <CardDescription>
+                Approval from the Department Head of the division whose disbursement is being processed
+              </CardDescription>
+            </div>
+            {deptHead.approval !== "Pending" && getStatusBadge(deptHead.approval)}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-muted/50 p-4 rounded-lg">
+            <p className="text-sm text-muted-foreground mb-2">
+              <AlertCircle className="h-4 w-4 inline mr-1" />
+              The Department Head approval is tied to the specific division whose transaction is being disbursed.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="dept-division">Select Division *</Label>
-              <Select value={deptHead.division} onValueChange={(value) => setDeptHead({ ...deptHead, division: value, headName: value === "Financial Services" ? "Robert Thompson" : "Maria Garcia" })}>
+              <Label htmlFor="dept-division">Division *</Label>
+              <Select value={deptHead.division} onValueChange={handleDivisionChange}>
                 <SelectTrigger id="dept-division">
                   <SelectValue placeholder="Select division" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Financial Services">Financial Services</SelectItem>
-                  <SelectItem value="Investments">Investments</SelectItem>
-                  <SelectItem value="Infrastructure">Infrastructure</SelectItem>
-                  <SelectItem value="SME Finance">SME Finance</SelectItem>
+                  {Object.keys(divisionHeads).map((division) => (
+                    <SelectItem key={division} value={division}>{division}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="dept-head">Department Head Name</Label>
+              <Label htmlFor="dept-head">Department Head</Label>
               <Input 
                 id="dept-head"
                 value={deptHead.headName}
                 readOnly
                 className="bg-muted"
-                placeholder="Auto-filled from division"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dept-title">Title</Label>
+              <Input 
+                id="dept-title"
+                value={deptHead.headTitle}
+                readOnly
+                className="bg-muted"
               />
             </div>
           </div>
+          
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="dept-approval">Approval Status</Label>
-              <Select value={deptHead.approval} onValueChange={(value) => setDeptHead({ ...deptHead, approval: value })}>
-                <SelectTrigger id="dept-approval">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Approved">Approved</SelectItem>
-                  <SelectItem value="Pending">Pending</SelectItem>
-                  <SelectItem value="Declined">Declined</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="dept-comment">Comment (optional)</Label>
+              <Textarea
+                id="dept-comment"
+                value={deptHead.comment}
+                onChange={(e) => setDeptHead({ ...deptHead, comment: e.target.value })}
+                placeholder="Add any comments or conditions..."
+                rows={3}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="dept-doc">Signed Approval Form (optional)</Label>
-              <Input id="dept-doc" type="file" />
+              <Input id="dept-doc" type="file" className="mt-2" />
             </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="dept-comment">Comment (optional)</Label>
-            <Textarea 
-              id="dept-comment"
-              value={deptHead.comment}
-              onChange={(e) => setDeptHead({ ...deptHead, comment: e.target.value })}
-              placeholder="Enter any comments or notes"
-              rows={3}
-            />
-          </div>
-          <Button onClick={handleDeptHeadApproval} className="gap-2">
-            <CheckCircle className="h-4 w-4" />
-            Record Department Head Approval
-          </Button>
+          
+          {deptHead.approval === "Pending" ? (
+            <div className="flex gap-2">
+              <Button onClick={() => handleDeptHeadApproval("Approved")} className="gap-2">
+                <CheckCircle className="h-4 w-4" />
+                Approve
+              </Button>
+              <Button variant="destructive" onClick={() => handleDeptHeadApproval("Declined")} className="gap-2">
+                <XCircle className="h-4 w-4" />
+                Decline
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
+              <span className="text-sm">
+                {deptHead.approval === "Approved" ? "✓" : "✗"} {deptHead.approval} by <strong>{deptHead.headName}</strong> on {deptHead.approvalDate}
+              </span>
+              <Button variant="outline" size="sm" onClick={() => setDeptHead({ ...deptHead, approval: "Pending", approvalDate: "" })}>
+                Reset
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Section 4: EXCO Member Approvals */}
+      {/* Section 4: Constant EXCO Member Approvals */}
       <Card>
         <CardHeader>
-          <CardTitle>EXCO Member Sign-Offs</CardTitle>
-          <CardDescription>Executive Committee member approvals</CardDescription>
-          <div className="flex items-center gap-4 mt-4">
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">EXCO Approvals Progress</span>
-                <span className="text-sm font-semibold text-primary">{approvedExcoCount} of {excoMembers.length} Completed</span>
-              </div>
-              <Progress value={excoProgress} className="h-2" />
-            </div>
-          </div>
+          <CardTitle className="flex items-center gap-2">
+            <Landmark className="h-5 w-5 text-primary" />
+            EXCO Member Approvals
+          </CardTitle>
+          <CardDescription>
+            The following approvals are required for ALL disbursements regardless of division
+          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              <strong>Note:</strong> General Counsel, Chief Risk Officer, Chief Financial Officer, and Chief Executive Officer approvals are constant requirements for all disbursements.
+            </p>
+          </div>
+          
+          <div className="space-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-muted-foreground">Approval Progress</span>
+              <span className="text-sm font-semibold">{approvedExcoCount} / {excoMembers.length}</span>
+            </div>
+            <Progress value={excoProgress} className="h-2" />
+          </div>
+          
           <div className="space-y-4">
             {excoMembers.map((member) => (
-              <Card key={member.id} className="border-l-4" style={{ borderLeftColor: member.status === "Approved" ? "hsl(var(--success))" : member.status === "Declined" ? "hsl(var(--destructive))" : "hsl(var(--warning))" }}>
-                <CardContent className="pt-6">
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-                    <div>
-                      <Label className="text-xs text-muted-foreground">Role</Label>
-                      <p className="font-semibold text-foreground">{member.role}</p>
-                      <p className="text-sm text-muted-foreground">{member.name}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor={`status-${member.id}`}>Status</Label>
-                      <Select value={member.status} onValueChange={(value: "Approved" | "Pending" | "Declined") => handleExcoStatusChange(member.id, value)}>
-                        <SelectTrigger id={`status-${member.id}`}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Approved">Approved</SelectItem>
-                          <SelectItem value="Pending">Pending</SelectItem>
-                          <SelectItem value="Declined">Declined</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor={`comment-${member.id}`}>Comment (optional)</Label>
-                      <Input 
-                        id={`comment-${member.id}`}
-                        value={member.comment}
-                        onChange={(e) => handleExcoCommentChange(member.id, e.target.value)}
-                        placeholder="Enter comment"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {getStatusBadge(member.status)}
-                      {member.status !== "Approved" && (
-                        <Button 
-                          size="sm"
-                          onClick={() => handleExcoMemberApproval(member.id)}
-                          className="gap-2"
-                        >
-                          <CheckCircle className="h-4 w-4" />
-                          Approve
-                        </Button>
-                      )}
-                    </div>
+              <div key={member.id} className={`border rounded-lg p-4 ${member.status === "Approved" ? "border-green-200 bg-green-50/50 dark:bg-green-950/20" : member.status === "Declined" ? "border-red-200 bg-red-50/50 dark:bg-red-950/20" : ""}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="font-semibold">{member.role}</p>
+                    <p className="text-sm text-muted-foreground">{member.name}</p>
                   </div>
-                </CardContent>
-              </Card>
+                  {getStatusBadge(member.status)}
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor={`comment-${member.id}`}>Comment</Label>
+                    <Textarea
+                      id={`comment-${member.id}`}
+                      value={member.comment}
+                      onChange={(e) => handleExcoCommentChange(member.id, e.target.value)}
+                      placeholder="Add comment..."
+                      rows={2}
+                    />
+                  </div>
+                  
+                  {member.status === "Pending" && (
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={() => handleExcoMemberApproval(member.id)} className="gap-1">
+                        <CheckCircle className="h-3 w-3" />
+                        Approve
+                      </Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleExcoStatusChange(member.id, "Declined")} className="gap-1">
+                        <XCircle className="h-3 w-3" />
+                        Decline
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Section 5: Final Decision & Communication */}
+      {/* Section 5: Final EXCO Decision & Communication */}
       <Card className="border-primary">
         <CardHeader>
-          <CardTitle>Final EXCO Decision</CardTitle>
-          <CardDescription>Record the executive committee's final disbursement decision</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            Final EXCO Decision
+          </CardTitle>
+          <CardDescription>Record the executive committee's final disbursement decision and communicate to Transaction Team</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Approval Summary */}
+          <div className="bg-muted/50 p-4 rounded-lg">
+            <h4 className="font-semibold mb-3">Approval Summary</h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <span className="text-muted-foreground">Divisional Head:</span>
+                <p className="font-medium">{deptHead.approval === "Approved" ? "✓ Approved" : deptHead.approval === "Declined" ? "✗ Declined" : "⏳ Pending"}</p>
+              </div>
+              <div>
+                <span className="text-muted-foreground">General Counsel:</span>
+                <p className="font-medium">{excoMembers.find(m => m.role === "General Counsel")?.status === "Approved" ? "✓ Approved" : "⏳ Pending"}</p>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Chief Risk Officer:</span>
+                <p className="font-medium">{excoMembers.find(m => m.role === "Chief Risk Officer")?.status === "Approved" ? "✓ Approved" : "⏳ Pending"}</p>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Chief Financial Officer:</span>
+                <p className="font-medium">{excoMembers.find(m => m.role === "Chief Financial Officer")?.status === "Approved" ? "✓ Approved" : "⏳ Pending"}</p>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Chief Executive Officer:</span>
+                <p className="font-medium">{excoMembers.find(m => m.role === "Chief Executive Officer")?.status === "Approved" ? "✓ Approved" : "⏳ Pending"}</p>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Waivers Approved:</span>
+                <p className="font-medium">{waivers.filter(w => w.approved).length} / {waivers.length}</p>
+              </div>
+            </div>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="final-approval">Disbursement Approval *</Label>
+              <Label htmlFor="final-approval">Disbursement Decision *</Label>
               <Select 
                 value={finalDecision.approved ? "Approved" : "Rejected"} 
                 onValueChange={(value) => setFinalDecision({ ...finalDecision, approved: value === "Approved" })}
@@ -566,13 +704,13 @@ export default function EXCOApproval() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Approved">Approved</SelectItem>
-                  <SelectItem value="Rejected">Rejected</SelectItem>
+                  <SelectItem value="Approved">Approved - Proceed to Disbursement</SelectItem>
+                  <SelectItem value="Rejected">Rejected - Return to Transaction Team</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="approval-date">Approval Date *</Label>
+              <Label htmlFor="approval-date">Decision Date *</Label>
               <Input 
                 id="approval-date"
                 type="date"
@@ -581,18 +719,20 @@ export default function EXCOApproval() {
               />
             </div>
           </div>
+          
           <div className="space-y-2">
-            <Label htmlFor="exco-notes">Notes</Label>
+            <Label htmlFor="exco-notes">EXCO Resolution Notes</Label>
             <Textarea 
               id="exco-notes"
               value={finalDecision.notes}
               onChange={(e) => setFinalDecision({ ...finalDecision, notes: e.target.value })}
-              placeholder="Enter EXCO comments and decision notes"
+              placeholder="Enter EXCO resolution notes, conditions, and any special instructions for disbursement..."
               rows={4}
             />
           </div>
+          
           <div className="space-y-2">
-            <Label htmlFor="signed-resolution">Attach Signed Resolution</Label>
+            <Label htmlFor="signed-resolution">Attach Signed EXCO Resolution</Label>
             <div className="flex items-center gap-2">
               <Input 
                 id="signed-resolution"
@@ -604,6 +744,7 @@ export default function EXCOApproval() {
               </Button>
             </div>
           </div>
+          
           <div className="flex flex-wrap gap-3 pt-4 border-t">
             <Button variant="outline" onClick={handleSaveDraft} className="gap-2">
               <FileText className="h-4 w-4" />
@@ -613,11 +754,25 @@ export default function EXCOApproval() {
               <CheckCircle className="h-4 w-4" />
               Submit Decision
             </Button>
-            <Button variant="secondary" onClick={handleNotifyTeam} className="gap-2">
+            <Button 
+              variant="secondary" 
+              onClick={handleNotifyTeam} 
+              className="gap-2"
+              disabled={excoDecisionCommunicated}
+            >
               <Send className="h-4 w-4" />
-              Notify Transaction Team
+              {excoDecisionCommunicated ? "Team Notified" : "Notify Transaction Team"}
             </Button>
           </div>
+          
+          {excoDecisionCommunicated && (
+            <div className="bg-green-50 dark:bg-green-950/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+              <p className="text-sm text-green-700 dark:text-green-300 flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                EXCO decision has been communicated to the Transaction Team. They can now proceed with disbursement processing.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

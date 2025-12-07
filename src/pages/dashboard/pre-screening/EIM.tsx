@@ -5,12 +5,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Download, Upload, Send } from "lucide-react";
+import { FileText, Download, Upload, Send, Clock, AlertTriangle, CheckCircle, Calendar } from "lucide-react";
+import { differenceInBusinessDays, format, addBusinessDays } from "date-fns";
 
 const eimDrafts = [
-  { id: 1, company: "Tech Solutions Ltd", status: "approved", updatedAt: "2024-01-15" },
-  { id: 2, company: "Green Energy Corp", status: "pending", updatedAt: "2024-01-14" },
-  { id: 3, company: "Manufacturing Inc", status: "stepped-down", updatedAt: "2024-01-13" },
+  { id: 1, company: "Tech Solutions Ltd", status: "approved", updatedAt: "2024-01-15", subInvestCoDate: "2024-01-22", submittedDate: "2024-01-15" },
+  { id: 2, company: "Green Energy Corp", status: "pending", updatedAt: "2024-01-14", subInvestCoDate: "2024-01-23", submittedDate: null },
+  { id: 3, company: "Manufacturing Inc", status: "stepped-down", updatedAt: "2024-01-13", subInvestCoDate: "2024-01-18", submittedDate: "2024-01-11" },
 ];
 
 const getStatusColor = (status: string) => {
@@ -22,9 +23,36 @@ const getStatusColor = (status: string) => {
   }
 };
 
+const getDeadlineStatus = (subInvestCoDate: string, submittedDate: string | null) => {
+  const meetingDate = new Date(subInvestCoDate);
+  const today = new Date();
+  const daysUntilMeeting = differenceInBusinessDays(meetingDate, today);
+  const submissionDeadline = addBusinessDays(meetingDate, -5);
+  
+  if (submittedDate) {
+    const submitted = new Date(submittedDate);
+    const daysBeforeMeeting = differenceInBusinessDays(meetingDate, submitted);
+    if (daysBeforeMeeting >= 5) {
+      return { status: "on-time", message: `Submitted ${daysBeforeMeeting} business days before meeting`, color: "success" };
+    } else {
+      return { status: "late", message: `Submitted ${daysBeforeMeeting} business days before (5 required)`, color: "warning" };
+    }
+  }
+  
+  if (daysUntilMeeting < 5) {
+    return { status: "overdue", message: `Deadline passed - Meeting in ${daysUntilMeeting} days`, color: "destructive" };
+  } else if (daysUntilMeeting <= 7) {
+    return { status: "urgent", message: `Submit by ${format(submissionDeadline, "MMM d")} (${daysUntilMeeting - 5} days left)`, color: "warning" };
+  } else {
+    return { status: "ok", message: `Deadline: ${format(submissionDeadline, "MMM d, yyyy")}`, color: "default" };
+  }
+};
+
 const EIM = () => {
   const [selectedDraft, setSelectedDraft] = useState(eimDrafts[0]);
   const { toast } = useToast();
+
+  const deadlineInfo = getDeadlineStatus(selectedDraft.subInvestCoDate, selectedDraft.submittedDate);
 
   return (
     <div className="container mx-auto p-6">
@@ -32,6 +60,19 @@ const EIM = () => {
         <h2 className="text-3xl font-bold">EIM Drafting</h2>
         <p className="text-muted-foreground">Template-based EIM document editor</p>
       </div>
+
+      {/* 5-Day Deadline Alert */}
+      <Card className="mb-6 p-4 border-warning/50 bg-warning/5">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-warning mt-0.5" />
+          <div className="flex-1">
+            <p className="font-medium text-sm">Sub-Investment Committee Submission Requirement</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              EIM documents must be submitted to Corporate Secretariat and Risk at least <strong>5 business days</strong> before the proposed Sub-Investment Committee meeting (every Tuesday).
+            </p>
+          </div>
+        </div>
+      </Card>
 
       <div className="grid grid-cols-12 gap-6">
         {/* Sidebar List */}
@@ -45,25 +86,38 @@ const EIM = () => {
               </Button>
             </div>
             <div className="space-y-2">
-              {eimDrafts.map((draft) => (
-                <Card
-                  key={draft.id}
-                  className={`p-3 cursor-pointer transition-colors hover:bg-accent ${
-                    selectedDraft.id === draft.id ? "border-primary" : ""
-                  }`}
-                  onClick={() => setSelectedDraft(draft)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{draft.company}</p>
-                      <p className="text-xs text-muted-foreground">{draft.updatedAt}</p>
+              {eimDrafts.map((draft) => {
+                const deadline = getDeadlineStatus(draft.subInvestCoDate, draft.submittedDate);
+                return (
+                  <Card
+                    key={draft.id}
+                    className={`p-3 cursor-pointer transition-colors hover:bg-accent ${
+                      selectedDraft.id === draft.id ? "border-primary" : ""
+                    }`}
+                    onClick={() => setSelectedDraft(draft)}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{draft.company}</p>
+                        <p className="text-xs text-muted-foreground">{draft.updatedAt}</p>
+                      </div>
+                      <Badge variant={getStatusColor(draft.status)}>
+                        {draft.status === "stepped-down" ? "Stepped Down" : draft.status}
+                      </Badge>
                     </div>
-                    <Badge variant={getStatusColor(draft.status)}>
-                      {draft.status === "stepped-down" ? "Stepped Down" : draft.status}
+                    <div className="flex items-center gap-1 text-xs mt-2">
+                      <Calendar className="h-3 w-3" />
+                      <span className="text-muted-foreground">Sub-InvestCo: {draft.subInvestCoDate}</span>
+                    </div>
+                    <Badge variant={deadline.color as any} className="mt-2 text-xs">
+                      {deadline.status === "on-time" && <CheckCircle className="h-3 w-3 mr-1" />}
+                      {deadline.status === "overdue" && <AlertTriangle className="h-3 w-3 mr-1" />}
+                      {deadline.status === "urgent" && <Clock className="h-3 w-3 mr-1" />}
+                      {deadline.message}
                     </Badge>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                );
+              })}
             </div>
           </Card>
         </div>
@@ -72,7 +126,17 @@ const EIM = () => {
         <div className="col-span-8">
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold">{selectedDraft.company}</h3>
+              <div>
+                <h3 className="text-xl font-bold">{selectedDraft.company}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant={deadlineInfo.color as any} className="flex items-center gap-1">
+                    {deadlineInfo.status === "on-time" && <CheckCircle className="h-3 w-3" />}
+                    {deadlineInfo.status === "overdue" && <AlertTriangle className="h-3 w-3" />}
+                    {deadlineInfo.status === "urgent" && <Clock className="h-3 w-3" />}
+                    {deadlineInfo.message}
+                  </Badge>
+                </div>
+              </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm">
                   <Download className="h-4 w-4 mr-2" />

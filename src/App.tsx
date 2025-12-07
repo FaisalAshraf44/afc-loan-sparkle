@@ -27,6 +27,9 @@ import InvestCo from "./pages/dashboard/approval/InvestCo";
 import BRIC from "./pages/dashboard/approval/BRIC";
 import Board from "./pages/dashboard/approval/Board";
 import Tracking from "./pages/dashboard/approval/Tracking";
+import MandateLetter from "./pages/dashboard/approval/MandateLetter";
+import CEOApproval from "./pages/dashboard/approval/CEOApproval";
+import DivisionalApproval from "./pages/dashboard/pre-screening/DivisionalApproval";
 import CPTracker from "./pages/dashboard/pre-disbursement/CPTracker";
 import Repository from "./pages/dashboard/pre-disbursement/Repository";
 import Legal from "./pages/dashboard/pre-disbursement/Legal";
@@ -62,11 +65,14 @@ const App = () => (
             <Route path="pre-screening/review" element={<DivisionalReview />} />
             <Route path="pre-screening/risk" element={<RiskAssessment />} />
             <Route path="pre-screening/sub-investco" element={<SubInvestCo />} />
+            <Route path="approval/mandate-letter" element={<MandateLetter />} />
             <Route path="approval/fim" element={<FIM />} />
             <Route path="approval/investco" element={<InvestCo />} />
+            <Route path="approval/ceo-approval" element={<CEOApproval />} />
             <Route path="approval/bric" element={<BRIC />} />
             <Route path="approval/board" element={<Board />} />
             <Route path="approval/tracking" element={<Tracking />} />
+            <Route path="pre-screening/divisional-approval" element={<DivisionalApproval />} />
             <Route path="pre-disbursement/cp-tracker" element={<CPTracker />} />
             <Route path="pre-disbursement/repository" element={<Repository />} />
             <Route path="pre-disbursement/legal" element={<Legal />} />

@@ -98,6 +98,13 @@ const navigationGroups = [
     ],
   },
   {
+    label: "Legal & Documentation",
+    department: "legal" as Department,
+    items: [
+      { title: "Deal Documentation", url: "/dashboard/legal/documentation", icon: FileText },
+    ],
+  },
+  {
     label: "Pre-Disbursement",
     department: "legal" as Department,
     items: [

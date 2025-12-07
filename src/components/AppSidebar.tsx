@@ -14,9 +14,12 @@ import {
   PieChart,
   UserCog,
   ClipboardList,
-  Bell
+  Bell,
+  Building2,
+  ChevronDown
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useState } from "react";
 
 import {
   Sidebar,
@@ -30,10 +33,34 @@ import {
   SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+type Department = "all" | "origination" | "risk" | "legal" | "treasury" | "admin";
+
+interface DepartmentConfig {
+  label: string;
+  icon: typeof Building2;
+  color: string;
+}
+
+const departmentConfig: Record<Department, DepartmentConfig> = {
+  all: { label: "All Departments", icon: Building2, color: "text-primary" },
+  origination: { label: "Origination", icon: Users, color: "text-blue-500" },
+  risk: { label: "Risk & Analysis", icon: BarChart3, color: "text-amber-500" },
+  legal: { label: "Legal", icon: Shield, color: "text-purple-500" },
+  treasury: { label: "Treasury", icon: DollarSign, color: "text-emerald-500" },
+  admin: { label: "Admin", icon: UserCog, color: "text-rose-500" },
+};
 
 const navigationGroups = [
   {
     label: "Deal Origination",
+    department: "origination" as Department,
     items: [
       { title: "CRM & Leads", url: "/dashboard/origination/crm", icon: Users },
       { title: "NDA Management", url: "/dashboard/origination/nda", icon: FileText },
@@ -43,6 +70,7 @@ const navigationGroups = [
   },
   {
     label: "Investment Pre-Screening",
+    department: "risk" as Department,
     items: [
       { title: "EIM Drafting", url: "/dashboard/pre-screening/eim", icon: FileText },
       { title: "Divisional Review", url: "/dashboard/pre-screening/review", icon: Search },
@@ -52,6 +80,7 @@ const navigationGroups = [
   },
   {
     label: "Investment Approval",
+    department: "risk" as Department,
     items: [
       { title: "FIM Preparation", url: "/dashboard/approval/fim", icon: FileText },
       { title: "InvestCo Review", url: "/dashboard/approval/investco", icon: Users },
@@ -62,6 +91,7 @@ const navigationGroups = [
   },
   {
     label: "Pre-Disbursement",
+    department: "legal" as Department,
     items: [
       { title: "CP Tracker", url: "/dashboard/pre-disbursement/cp-tracker", icon: ClipboardList },
       { title: "Document Repository", url: "/dashboard/pre-disbursement/repository", icon: FileOutput },
@@ -71,6 +101,7 @@ const navigationGroups = [
   },
   {
     label: "Disbursement & Monitoring",
+    department: "treasury" as Department,
     items: [
       { title: "Disbursement Process", url: "/dashboard/disbursement/process", icon: Activity },
       { title: "EXCO Approval", url: "/dashboard/disbursement/exco-approval", icon: CheckCircle },
@@ -81,6 +112,7 @@ const navigationGroups = [
   },
   {
     label: "System Administration",
+    department: "admin" as Department,
     items: [
       { title: "User Management", url: "/dashboard/admin/users", icon: UserCog },
       { title: "Role Permissions", url: "/dashboard/admin/roles", icon: Shield },
@@ -94,8 +126,16 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
+  const [selectedDepartment, setSelectedDepartment] = useState<Department>("all");
 
   const isActive = (path: string) => currentPath === path;
+
+  const filteredGroups = selectedDepartment === "all" 
+    ? navigationGroups 
+    : navigationGroups.filter(group => group.department === selectedDepartment);
+
+  const currentDeptConfig = departmentConfig[selectedDepartment];
+  const DeptIcon = currentDeptConfig.icon;
 
   return (
     <Sidebar collapsible="icon">
@@ -111,31 +151,67 @@ export function AppSidebar() {
             </div>
           )}
         </div>
+
+        {/* Department Selector */}
+        {state !== "collapsed" && (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="mt-4 w-full flex items-center justify-between px-3 py-2 rounded-lg border border-border bg-muted/50 hover:bg-muted transition-colors">
+              <div className="flex items-center gap-2">
+                <DeptIcon className={`h-4 w-4 ${currentDeptConfig.color}`} />
+                <span className="text-sm font-medium">{currentDeptConfig.label}</span>
+              </div>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-[200px]">
+              {(Object.entries(departmentConfig) as [Department, DepartmentConfig][]).map(([key, config]) => {
+                const Icon = config.icon;
+                return (
+                  <DropdownMenuItem 
+                    key={key}
+                    onClick={() => setSelectedDepartment(key)}
+                    className={selectedDepartment === key ? "bg-muted" : ""}
+                  >
+                    <Icon className={`h-4 w-4 mr-2 ${config.color}`} />
+                    {config.label}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </SidebarHeader>
 
       <SidebarContent>
-        {navigationGroups.map((group) => (
-          <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.items.map((item) => {
-                  const active = isActive(item.url);
-                  return (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild isActive={active}>
-                        <NavLink to={item.url}>
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+        {filteredGroups.map((group) => {
+          const groupConfig = departmentConfig[group.department];
+          return (
+            <SidebarGroup key={group.label}>
+              <SidebarGroupLabel className="flex items-center gap-2">
+                {state !== "collapsed" && (
+                  <span className={`w-2 h-2 rounded-full ${groupConfig.color.replace('text-', 'bg-')}`} />
+                )}
+                {group.label}
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {group.items.map((item) => {
+                    const active = isActive(item.url);
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton asChild isActive={active}>
+                          <NavLink to={item.url}>
+                            <item.icon />
+                            <span>{item.title}</span>
+                          </NavLink>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          );
+        })}
       </SidebarContent>
     </Sidebar>
   );

@@ -5,8 +5,9 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ClipboardCheck, Bell, AlertTriangle, CheckCircle2, Plus, FileText, Scale, Shield } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { ClipboardCheck, Bell, AlertTriangle, CheckCircle2, Plus, FileText, Scale, Shield, Award, Download, Send, Printer } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,18 +32,44 @@ interface LegalRiskIssue {
   resolvedDate?: string;
 }
 
+interface SatisfactionLetter {
+  id: string;
+  dealName: string;
+  issuedDate: string;
+  issuedBy: string;
+  status: "draft" | "issued" | "acknowledged";
+  totalConditions: number;
+  completedConditions: number;
+  waivedConditions: number;
+}
+
 const CPTracker = () => {
   const { toast } = useToast();
   const [selectedApplication, setSelectedApplication] = useState<string>("");
   const [newConditionName, setNewConditionName] = useState("");
   const [newConditionCategory, setNewConditionCategory] = useState("");
   const [newConditionParty, setNewConditionParty] = useState("");
+  const [satisfactionLetterNotes, setSatisfactionLetterNotes] = useState("");
+  const [showLetterDialog, setShowLetterDialog] = useState(false);
   
   const applications = [
     { id: "1", name: "Project Atlas - $5M", borrower: "TechCorp Industries" },
     { id: "2", name: "Project Neptune - $3.2M", borrower: "Global Energy Ltd" },
     { id: "3", name: "Project Titan - $7.5M", borrower: "Industrial Manufacturing Co" },
   ];
+
+  const [satisfactionLetters, setSatisfactionLetters] = useState<SatisfactionLetter[]>([
+    {
+      id: "sl-1",
+      dealName: "Project Neptune - $3.2M",
+      issuedDate: "2024-01-20",
+      issuedBy: "Sarah Mitchell, Legal Counsel",
+      status: "issued",
+      totalConditions: 8,
+      completedConditions: 7,
+      waivedConditions: 1,
+    }
+  ]);
 
   const [conditions, setConditions] = useState<Condition[]>([
     { id: 1, name: "Board Resolution", status: "completed", category: "Corporate", responsibleParty: "Legal Team", dueDate: "2024-01-25" },
@@ -218,7 +245,7 @@ const CPTracker = () => {
         </Card>
       ) : (
         <Tabs defaultValue="conditions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="conditions">
               <ClipboardCheck className="h-4 w-4 mr-2" />
               Conditions Precedent
@@ -226,6 +253,10 @@ const CPTracker = () => {
             <TabsTrigger value="issues">
               <AlertTriangle className="h-4 w-4 mr-2" />
               Legal & Risk Issues
+            </TabsTrigger>
+            <TabsTrigger value="satisfaction">
+              <Award className="h-4 w-4 mr-2" />
+              Satisfaction Letter
             </TabsTrigger>
           </TabsList>
 
@@ -598,6 +629,256 @@ const CPTracker = () => {
                 ))}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* CP Satisfaction Letter Tab */}
+          <TabsContent value="satisfaction" className="space-y-6">
+            {/* Eligibility Check */}
+            {(() => {
+              const completedOrWaived = conditions.filter(c => c.status === "completed" || c.status === "waived").length;
+              const allResolved = legalRiskIssues.every(i => i.status === "resolved");
+              const isEligible = completedOrWaived === conditions.length && allResolved;
+              const selectedApp = applications.find(a => a.id === selectedApplication);
+              const existingLetter = satisfactionLetters.find(l => l.dealName === selectedApp?.name);
+
+              return (
+                <>
+                  {/* Eligibility Status */}
+                  <Card className={isEligible ? "border-green-500/50 bg-green-500/5" : "border-amber-500/50 bg-amber-500/5"}>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        {isEligible ? (
+                          <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        ) : (
+                          <AlertTriangle className="h-5 w-5 text-amber-500" />
+                        )}
+                        CP Satisfaction Status
+                      </CardTitle>
+                      <CardDescription>
+                        {isEligible 
+                          ? "All conditions precedent are satisfied. Legal Counsel can now issue the Satisfaction Letter."
+                          : "Some conditions are still pending or outstanding issues remain unresolved."
+                        }
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="text-center p-3 rounded-lg bg-background">
+                          <div className="text-2xl font-bold text-green-600">{conditions.filter(c => c.status === "completed").length}</div>
+                          <p className="text-xs text-muted-foreground">Completed</p>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-background">
+                          <div className="text-2xl font-bold text-blue-600">{conditions.filter(c => c.status === "waived").length}</div>
+                          <p className="text-xs text-muted-foreground">Waived</p>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-background">
+                          <div className="text-2xl font-bold text-amber-600">{conditions.filter(c => c.status === "pending" || c.status === "deferred").length}</div>
+                          <p className="text-xs text-muted-foreground">Outstanding</p>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-background">
+                          <div className="text-2xl font-bold">{legalRiskIssues.filter(i => i.status !== "resolved").length}</div>
+                          <p className="text-xs text-muted-foreground">Open Issues</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Existing Letter or Issue New */}
+                  {existingLetter ? (
+                    <Card>
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <CardTitle className="flex items-center gap-2">
+                              <Award className="h-5 w-5 text-primary" />
+                              CP Satisfaction Letter Issued
+                            </CardTitle>
+                            <CardDescription>
+                              Letter issued on {existingLetter.issuedDate} by {existingLetter.issuedBy}
+                            </CardDescription>
+                          </div>
+                          <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            {existingLetter.status === "acknowledged" ? "Acknowledged" : "Issued"}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="p-4 rounded-lg border bg-muted/30">
+                          <h4 className="font-medium mb-3">Letter Summary</h4>
+                          <div className="grid grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <p className="text-muted-foreground">Total Conditions</p>
+                              <p className="font-semibold">{existingLetter.totalConditions}</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Completed</p>
+                              <p className="font-semibold text-green-600">{existingLetter.completedConditions}</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Waived</p>
+                              <p className="font-semibold text-blue-600">{existingLetter.waivedConditions}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" className="flex-1">
+                            <Download className="h-4 w-4 mr-2" />
+                            Download Letter
+                          </Button>
+                          <Button variant="outline" className="flex-1">
+                            <Printer className="h-4 w-4 mr-2" />
+                            Print
+                          </Button>
+                          {existingLetter.status !== "acknowledged" && (
+                            <Button 
+                              className="flex-1"
+                              onClick={() => {
+                                setSatisfactionLetters(prev => prev.map(l => 
+                                  l.id === existingLetter.id ? { ...l, status: "acknowledged" } : l
+                                ));
+                                toast({
+                                  title: "Acknowledgment Recorded",
+                                  description: "The CP Satisfaction Letter has been acknowledged by all parties.",
+                                });
+                              }}
+                            >
+                              <CheckCircle2 className="h-4 w-4 mr-2" />
+                              Mark as Acknowledged
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Award className="h-5 w-5" />
+                          Issue CP Satisfaction Letter
+                        </CardTitle>
+                        <CardDescription>
+                          Legal Counsel must review and confirm all conditions before issuing the satisfaction letter
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Conditions Summary */}
+                        <div className="space-y-3">
+                          <h4 className="font-medium">Conditions Summary</h4>
+                          {categories.map(category => {
+                            const catConditions = conditions.filter(c => c.category === category);
+                            if (catConditions.length === 0) return null;
+                            const completed = catConditions.filter(c => c.status === "completed" || c.status === "waived").length;
+                            return (
+                              <div key={category} className="flex items-center justify-between p-3 rounded-lg border">
+                                <span className="font-medium">{category}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-muted-foreground">
+                                    {completed}/{catConditions.length} satisfied
+                                  </span>
+                                  {completed === catConditions.length ? (
+                                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <AlertTriangle className="h-4 w-4 text-amber-500" />
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Issue Button */}
+                        <Dialog open={showLetterDialog} onOpenChange={setShowLetterDialog}>
+                          <DialogTrigger asChild>
+                            <Button className="w-full" size="lg" disabled={!isEligible}>
+                              <Award className="h-4 w-4 mr-2" />
+                              {isEligible ? "Issue Satisfaction Letter" : "Complete All Conditions First"}
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-lg">
+                            <DialogHeader>
+                              <DialogTitle>Issue CP Satisfaction Letter</DialogTitle>
+                              <DialogDescription>
+                                Confirm issuance of the Conditions Precedent Satisfaction Letter for {selectedApp?.name}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 mt-4">
+                              <div className="p-4 rounded-lg bg-muted/50 space-y-2">
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Deal:</span>
+                                  <span className="font-medium">{selectedApp?.name}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Borrower:</span>
+                                  <span className="font-medium">{selectedApp?.borrower}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Total Conditions:</span>
+                                  <span className="font-medium">{conditions.length}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Completed:</span>
+                                  <span className="font-medium text-green-600">{conditions.filter(c => c.status === "completed").length}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">Waived:</span>
+                                  <span className="font-medium text-blue-600">{conditions.filter(c => c.status === "waived").length}</span>
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="text-sm font-medium">Legal Counsel Notes (Optional)</label>
+                                <Textarea 
+                                  placeholder="Add any notes or observations regarding the satisfaction of conditions..."
+                                  value={satisfactionLetterNotes}
+                                  onChange={(e) => setSatisfactionLetterNotes(e.target.value)}
+                                  className="mt-1"
+                                  rows={3}
+                                />
+                              </div>
+
+                              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                                <p className="text-sm text-amber-700 dark:text-amber-400">
+                                  <strong>Confirmation:</strong> By issuing this letter, you confirm that all conditions precedent 
+                                  have been satisfied or appropriately waived, and the transaction may proceed to disbursement.
+                                </p>
+                              </div>
+                            </div>
+                            <DialogFooter className="mt-4">
+                              <Button variant="outline" onClick={() => setShowLetterDialog(false)}>
+                                Cancel
+                              </Button>
+                              <Button onClick={() => {
+                                const newLetter: SatisfactionLetter = {
+                                  id: `sl-${Date.now()}`,
+                                  dealName: selectedApp?.name || "",
+                                  issuedDate: new Date().toISOString().split('T')[0],
+                                  issuedBy: "Legal Counsel",
+                                  status: "issued",
+                                  totalConditions: conditions.length,
+                                  completedConditions: conditions.filter(c => c.status === "completed").length,
+                                  waivedConditions: conditions.filter(c => c.status === "waived").length,
+                                };
+                                setSatisfactionLetters(prev => [...prev, newLetter]);
+                                setShowLetterDialog(false);
+                                setSatisfactionLetterNotes("");
+                                toast({
+                                  title: "Satisfaction Letter Issued",
+                                  description: "The CP Satisfaction Letter has been issued. Transaction team and Treasury have been notified.",
+                                });
+                              }}>
+                                <Send className="h-4 w-4 mr-2" />
+                                Issue Letter
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </CardContent>
+                    </Card>
+                  )}
+                </>
+              );
+            })()}
           </TabsContent>
         </Tabs>
       )}

@@ -31,6 +31,7 @@ import MandateLetter from "./pages/dashboard/approval/MandateLetter";
 import CEOApproval from "./pages/dashboard/approval/CEOApproval";
 import ApprovalCommunication from "./pages/dashboard/approval/ApprovalCommunication";
 import DivisionalApproval from "./pages/dashboard/pre-screening/DivisionalApproval";
+import DealDocumentation from "./pages/dashboard/legal/DealDocumentation";
 import CPTracker from "./pages/dashboard/pre-disbursement/CPTracker";
 import Repository from "./pages/dashboard/pre-disbursement/Repository";
 import Legal from "./pages/dashboard/pre-disbursement/Legal";
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="approval/board" element={<Board />} />
             <Route path="approval/tracking" element={<Tracking />} />
             <Route path="approval/communication" element={<ApprovalCommunication />} />
+            <Route path="legal/documentation" element={<DealDocumentation />} />
             <Route path="pre-screening/divisional-approval" element={<DivisionalApproval />} />
             <Route path="pre-disbursement/cp-tracker" element={<CPTracker />} />
             <Route path="pre-disbursement/repository" element={<Repository />} />

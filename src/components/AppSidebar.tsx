@@ -18,7 +18,8 @@ import {
   Bell,
   Building2,
   ChevronDown,
-  Database
+  Database,
+  Megaphone
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -124,6 +125,7 @@ const navigationGroups = [
       { title: "SAP Integration", url: "/dashboard/disbursement/sap-integration", icon: Database },
       { title: "Disbursement Process", url: "/dashboard/disbursement/process", icon: Activity },
       { title: "Treasury Execution", url: "/dashboard/disbursement/treasury", icon: DollarSign },
+      { title: "Investment Disclosure", url: "/dashboard/disbursement/investment-disclosure", icon: Megaphone },
       { title: "Portfolio Management", url: "/dashboard/disbursement/portfolio", icon: BarChart3 },
       { title: "Reports & Analytics", url: "/dashboard/disbursement/reports", icon: PieChart },
     ],

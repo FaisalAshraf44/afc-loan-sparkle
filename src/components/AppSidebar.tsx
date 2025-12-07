@@ -77,7 +77,7 @@ const navigationGroups = [
     department: "risk" as Department,
     items: [
       { title: "EIM Drafting", url: "/dashboard/pre-screening/eim", icon: FileText },
-      { title: "Divisional Review", url: "/dashboard/pre-screening/review", icon: Search },
+      { title: "Divisional Approval", url: "/dashboard/pre-screening/divisional-approval", icon: CheckCircle },
       { title: "Risk Assessment", url: "/dashboard/pre-screening/risk", icon: BarChart3 },
       { title: "Sub-InvestCo Meeting", url: "/dashboard/pre-screening/sub-investco", icon: Users },
     ],
@@ -86,8 +86,10 @@ const navigationGroups = [
     label: "Investment Approval",
     department: "risk" as Department,
     items: [
+      { title: "Mandate Letter", url: "/dashboard/approval/mandate-letter", icon: FileCheck },
       { title: "FIM Preparation", url: "/dashboard/approval/fim", icon: FileText },
       { title: "InvestCo Review", url: "/dashboard/approval/investco", icon: Users },
+      { title: "CEO Approval", url: "/dashboard/approval/ceo-approval", icon: UserCog },
       { title: "BRIC Review", url: "/dashboard/approval/bric", icon: FileCheck },
       { title: "Board Approval", url: "/dashboard/approval/board", icon: Gavel },
       { title: "Approval Tracking", url: "/dashboard/approval/tracking", icon: Activity },

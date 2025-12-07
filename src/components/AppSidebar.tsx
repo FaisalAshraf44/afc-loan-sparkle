@@ -17,7 +17,8 @@ import {
   ClipboardList,
   Bell,
   Building2,
-  ChevronDown
+  ChevronDown,
+  Database
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -120,6 +121,7 @@ const navigationGroups = [
     items: [
       { title: "Disbursement Process", url: "/dashboard/disbursement/process", icon: Activity },
       { title: "EXCO Approval", url: "/dashboard/disbursement/exco-approval", icon: CheckCircle },
+      { title: "SAP Integration", url: "/dashboard/disbursement/sap-integration", icon: Database },
       { title: "Treasury Execution", url: "/dashboard/disbursement/treasury", icon: DollarSign },
       { title: "Portfolio Management", url: "/dashboard/disbursement/portfolio", icon: BarChart3 },
       { title: "Reports & Analytics", url: "/dashboard/disbursement/reports", icon: PieChart },

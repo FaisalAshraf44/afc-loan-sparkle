@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   FileText, 
   Download, 
@@ -22,13 +23,70 @@ import {
   ShieldCheck,
   Landmark,
   FileCheck,
-  Leaf
+  Leaf,
+  AlertTriangle,
+  ArrowRight,
+  Clock,
+  UserCheck,
+  XCircle,
+  Plus,
+  Trash2
 } from "lucide-react";
 import { Link } from "react-router-dom";
+
+interface DealChange {
+  id: string;
+  category: string;
+  originalValue: string;
+  newValue: string;
+  reason: string;
+  approvedBy: string;
+}
+
+interface CPWaiver {
+  id: string;
+  cpName: string;
+  status: "waived" | "deferred" | "modified";
+  reason: string;
+  riskMitigation: string;
+  approvedBy: string;
+  approvalDate: string;
+}
 
 const ClosingMemo = () => {
   const { toast } = useToast();
   const [selectedApplication, setSelectedApplication] = useState<string>("");
+  const [activeTab, setActiveTab] = useState("overview");
+  
+  // Approval workflow state
+  const [approvalStatus, setApprovalStatus] = useState<"draft" | "pending-divisional" | "divisional-approved" | "pending-exco" | "exco-approved">("draft");
+  const [divisionalApprovalDate, setDivisionalApprovalDate] = useState<string>("");
+  const [divisionalApprover, setDivisionalApprover] = useState<string>("");
+  
+  // Deal structure changes
+  const [dealChanges, setDealChanges] = useState<DealChange[]>([
+    {
+      id: "1",
+      category: "Facility Amount",
+      originalValue: "$5,000,000",
+      newValue: "$4,800,000",
+      reason: "Reduced based on updated project costs",
+      approvedBy: "InvestCo"
+    }
+  ]);
+  
+  // CP Waivers/Deferrals
+  const [cpWaivers, setCpWaivers] = useState<CPWaiver[]>([
+    {
+      id: "1",
+      cpName: "Audited Financial Statements FY2024",
+      status: "deferred",
+      reason: "Audit in progress, expected completion within 30 days",
+      riskMitigation: "Unaudited statements reviewed; withhold 10% of disbursement until received",
+      approvedBy: "Risk Committee",
+      approvalDate: "2025-10-20"
+    }
+  ]);
   
   // Departmental clearances state
   const [clearances, setClearances] = useState({
@@ -47,6 +105,7 @@ const ClosingMemo = () => {
       code: "TCA-001",
       borrower: "Tech Corp Ltd",
       division: "Private Equity",
+      divisionalHead: "John Smith",
       facilityType: "Term Loan",
       approvedAmount: 5000000,
       approvalLevel: "Board",
@@ -61,6 +120,7 @@ const ClosingMemo = () => {
       code: "GEP-002",
       borrower: "GreenTech Solutions",
       division: "Infrastructure",
+      divisionalHead: "Sarah Johnson",
       facilityType: "Project Finance",
       approvedAmount: 8500000,
       approvalLevel: "Board",
@@ -75,6 +135,7 @@ const ClosingMemo = () => {
       code: "RED-003",
       borrower: "Cityscape Developers",
       division: "Real Estate",
+      divisionalHead: "Michael Chen",
       facilityType: "Senior Debt",
       approvedAmount: 12000000,
       approvalLevel: "BRIC",
@@ -91,8 +152,8 @@ const ClosingMemo = () => {
   const clearanceCount = Object.values(clearances).filter(val => val === "yes").length;
   const clearanceProgress = (clearanceCount / 5) * 100;
 
-  // Handle form submission
-  const handleSubmit = () => {
+  // Handle submit to Divisional Head
+  const handleSubmitToDivisional = () => {
     if (!selectedApplication) {
       toast({
         title: "Validation Error",
@@ -102,27 +163,39 @@ const ClosingMemo = () => {
       return;
     }
 
-    // Basic validation
-    const requiredFields = document.querySelectorAll('[required]');
-    let isValid = true;
-    requiredFields.forEach(field => {
-      if (!(field as HTMLInputElement).value) {
-        isValid = false;
-      }
+    setApprovalStatus("pending-divisional");
+    toast({
+      title: "Submitted for Divisional Approval",
+      description: `Closing memo sent to ${selectedApp?.divisionalHead} for approval.`,
     });
+  };
 
-    if (!isValid) {
+  // Handle Divisional Head approval
+  const handleDivisionalApproval = () => {
+    setApprovalStatus("divisional-approved");
+    setDivisionalApprovalDate(new Date().toISOString().split('T')[0]);
+    setDivisionalApprover(selectedApp?.divisionalHead || "");
+    toast({
+      title: "Divisional Head Approved",
+      description: "Closing memo approved by Divisional Head. Ready for EXCO Secretary submission.",
+    });
+  };
+
+  // Handle submit to EXCO Secretary
+  const handleSubmitToEXCO = () => {
+    if (approvalStatus !== "divisional-approved") {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields.",
+        title: "Approval Required",
+        description: "Divisional Head approval is required before submitting to EXCO Secretary.",
         variant: "destructive"
       });
       return;
     }
 
+    setApprovalStatus("pending-exco");
     toast({
-      title: "Closing Memo Submitted",
-      description: "Closing memo submitted successfully to EXCO Secretary.",
+      title: "Submitted to EXCO Secretary",
+      description: "Closing memo submitted to EXCO Secretary for EXCO approval to proceed to disbursement.",
     });
   };
 
@@ -140,12 +213,98 @@ const ClosingMemo = () => {
     });
   };
 
+  // Add new deal change
+  const addDealChange = () => {
+    const newChange: DealChange = {
+      id: Date.now().toString(),
+      category: "",
+      originalValue: "",
+      newValue: "",
+      reason: "",
+      approvedBy: ""
+    };
+    setDealChanges([...dealChanges, newChange]);
+  };
+
+  // Add new CP waiver
+  const addCPWaiver = () => {
+    const newWaiver: CPWaiver = {
+      id: Date.now().toString(),
+      cpName: "",
+      status: "waived",
+      reason: "",
+      riskMitigation: "",
+      approvedBy: "",
+      approvalDate: ""
+    };
+    setCpWaivers([...cpWaivers, newWaiver]);
+  };
+
+  const getApprovalStatusBadge = () => {
+    switch (approvalStatus) {
+      case "draft":
+        return <Badge variant="secondary"><Clock className="mr-1 h-3 w-3" /> Draft</Badge>;
+      case "pending-divisional":
+        return <Badge variant="outline" className="border-amber-500 text-amber-600"><Clock className="mr-1 h-3 w-3" /> Pending Divisional Approval</Badge>;
+      case "divisional-approved":
+        return <Badge variant="outline" className="border-green-500 text-green-600"><CheckCircle2 className="mr-1 h-3 w-3" /> Divisional Approved</Badge>;
+      case "pending-exco":
+        return <Badge variant="outline" className="border-blue-500 text-blue-600"><Clock className="mr-1 h-3 w-3" /> Pending EXCO Review</Badge>;
+      case "exco-approved":
+        return <Badge className="bg-green-600"><CheckCircle2 className="mr-1 h-3 w-3" /> EXCO Approved</Badge>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 max-w-5xl">
       <div className="mb-6">
-        <h2 className="text-3xl font-bold">Closing Memo Form</h2>
-        <p className="text-muted-foreground">Final pre-disbursement clearance documentation</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold">Closing Memo</h2>
+            <p className="text-muted-foreground">Pre-disbursement clearance with deal changes and CP status</p>
+          </div>
+          {selectedApp && getApprovalStatusBadge()}
+        </div>
       </div>
+
+      {/* Approval Workflow Progress */}
+      {selectedApp && (
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between gap-2 text-sm">
+              <div className={`flex flex-col items-center flex-1 ${approvalStatus !== "draft" ? "text-green-600" : "text-muted-foreground"}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${approvalStatus !== "draft" ? "bg-green-100" : "bg-muted"}`}>
+                  <FileText className="h-4 w-4" />
+                </div>
+                <span className="text-xs text-center">Draft</span>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              <div className={`flex flex-col items-center flex-1 ${["divisional-approved", "pending-exco", "exco-approved"].includes(approvalStatus) ? "text-green-600" : approvalStatus === "pending-divisional" ? "text-amber-600" : "text-muted-foreground"}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${["divisional-approved", "pending-exco", "exco-approved"].includes(approvalStatus) ? "bg-green-100" : approvalStatus === "pending-divisional" ? "bg-amber-100" : "bg-muted"}`}>
+                  <UserCheck className="h-4 w-4" />
+                </div>
+                <span className="text-xs text-center">Divisional Head</span>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              <div className={`flex flex-col items-center flex-1 ${approvalStatus === "exco-approved" ? "text-green-600" : approvalStatus === "pending-exco" ? "text-blue-600" : "text-muted-foreground"}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${approvalStatus === "exco-approved" ? "bg-green-100" : approvalStatus === "pending-exco" ? "bg-blue-100" : "bg-muted"}`}>
+                  <Send className="h-4 w-4" />
+                </div>
+                <span className="text-xs text-center">EXCO Secretary</span>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              <div className={`flex flex-col items-center flex-1 ${approvalStatus === "exco-approved" ? "text-green-600" : "text-muted-foreground"}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${approvalStatus === "exco-approved" ? "bg-green-100" : "bg-muted"}`}>
+                  <CheckCircle2 className="h-4 w-4" />
+                </div>
+                <span className="text-xs text-center">EXCO Approval</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="space-y-6">
         {/* Section 1: Transaction Overview */}
@@ -264,7 +423,283 @@ const ClosingMemo = () => {
               </CardContent>
             </Card>
 
-            {/* Section 3: Departmental Clearances */}
+            {/* Section 3: Deal Structure Changes */}
+            <Card>
+              <CardHeader className="border-b border-primary/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-1 w-12 bg-primary rounded" />
+                      <CardTitle>Deal Structure Changes</CardTitle>
+                    </div>
+                    <CardDescription>Document any changes from the original approved terms</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={addDealChange}>
+                    <Plus className="mr-1 h-4 w-4" />
+                    Add Change
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {dealChanges.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <FileCheck className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No deal structure changes recorded</p>
+                    <p className="text-sm">Click "Add Change" if there are modifications to the original terms</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {dealChanges.map((change, index) => (
+                      <div key={change.id} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold">Change #{index + 1}</h4>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => setDealChanges(dealChanges.filter(c => c.id !== change.id))}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Category</Label>
+                            <Select
+                              value={change.category}
+                              onValueChange={(val) => {
+                                const updated = dealChanges.map(c => c.id === change.id ? {...c, category: val} : c);
+                                setDealChanges(updated);
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select category" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="facility-amount">Facility Amount</SelectItem>
+                                <SelectItem value="interest-rate">Interest Rate</SelectItem>
+                                <SelectItem value="tenor">Tenor</SelectItem>
+                                <SelectItem value="security">Security Package</SelectItem>
+                                <SelectItem value="covenants">Covenants</SelectItem>
+                                <SelectItem value="disbursement">Disbursement Schedule</SelectItem>
+                                <SelectItem value="repayment">Repayment Terms</SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Approved By</Label>
+                            <Select
+                              value={change.approvedBy}
+                              onValueChange={(val) => {
+                                const updated = dealChanges.map(c => c.id === change.id ? {...c, approvedBy: val} : c);
+                                setDealChanges(updated);
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select approver" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Sub-InvestCo">Sub-InvestCo</SelectItem>
+                                <SelectItem value="InvestCo">InvestCo</SelectItem>
+                                <SelectItem value="BRIC">BRIC</SelectItem>
+                                <SelectItem value="Board">Board</SelectItem>
+                                <SelectItem value="Divisional Head">Divisional Head</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Original Value</Label>
+                            <Input
+                              value={change.originalValue}
+                              onChange={(e) => {
+                                const updated = dealChanges.map(c => c.id === change.id ? {...c, originalValue: e.target.value} : c);
+                                setDealChanges(updated);
+                              }}
+                              placeholder="Original approved value"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>New Value</Label>
+                            <Input
+                              value={change.newValue}
+                              onChange={(e) => {
+                                const updated = dealChanges.map(c => c.id === change.id ? {...c, newValue: e.target.value} : c);
+                                setDealChanges(updated);
+                              }}
+                              placeholder="Updated value"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Reason for Change</Label>
+                          <Textarea
+                            value={change.reason}
+                            onChange={(e) => {
+                              const updated = dealChanges.map(c => c.id === change.id ? {...c, reason: e.target.value} : c);
+                              setDealChanges(updated);
+                            }}
+                            placeholder="Explain why this change was made..."
+                            rows={2}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Section 4: CP Waivers & Deferrals */}
+            <Card>
+              <CardHeader className="border-b border-primary/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-1 w-12 bg-primary rounded" />
+                      <CardTitle>CP Waivers & Deferrals</CardTitle>
+                    </div>
+                    <CardDescription>Document any conditions that were waived, deferred, or modified</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={addCPWaiver}>
+                    <Plus className="mr-1 h-4 w-4" />
+                    Add Waiver/Deferral
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {cpWaivers.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <CheckCircle2 className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>All conditions precedent satisfied as originally approved</p>
+                    <p className="text-sm">Click "Add Waiver/Deferral" if any CPs were modified</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {cpWaivers.map((waiver, index) => (
+                      <div key={waiver.id} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-semibold">CP #{index + 1}</h4>
+                            {waiver.status === "waived" && (
+                              <Badge variant="destructive"><XCircle className="mr-1 h-3 w-3" /> Waived</Badge>
+                            )}
+                            {waiver.status === "deferred" && (
+                              <Badge variant="outline" className="border-amber-500 text-amber-600"><Clock className="mr-1 h-3 w-3" /> Deferred</Badge>
+                            )}
+                            {waiver.status === "modified" && (
+                              <Badge variant="outline" className="border-blue-500 text-blue-600"><AlertTriangle className="mr-1 h-3 w-3" /> Modified</Badge>
+                            )}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => setCpWaivers(cpWaivers.filter(w => w.id !== waiver.id))}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Condition Precedent Name</Label>
+                            <Input
+                              value={waiver.cpName}
+                              onChange={(e) => {
+                                const updated = cpWaivers.map(w => w.id === waiver.id ? {...w, cpName: e.target.value} : w);
+                                setCpWaivers(updated);
+                              }}
+                              placeholder="Name of the condition"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Status</Label>
+                            <Select
+                              value={waiver.status}
+                              onValueChange={(val: "waived" | "deferred" | "modified") => {
+                                const updated = cpWaivers.map(w => w.id === waiver.id ? {...w, status: val} : w);
+                                setCpWaivers(updated);
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="waived">Waived</SelectItem>
+                                <SelectItem value="deferred">Deferred</SelectItem>
+                                <SelectItem value="modified">Modified</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Reason</Label>
+                          <Textarea
+                            value={waiver.reason}
+                            onChange={(e) => {
+                              const updated = cpWaivers.map(w => w.id === waiver.id ? {...w, reason: e.target.value} : w);
+                              setCpWaivers(updated);
+                            }}
+                            placeholder="Explain why this CP was waived/deferred/modified..."
+                            rows={2}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Risk Mitigation Measures</Label>
+                          <Textarea
+                            value={waiver.riskMitigation}
+                            onChange={(e) => {
+                              const updated = cpWaivers.map(w => w.id === waiver.id ? {...w, riskMitigation: e.target.value} : w);
+                              setCpWaivers(updated);
+                            }}
+                            placeholder="What measures are in place to mitigate the risk of this waiver/deferral..."
+                            rows={2}
+                          />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Approved By</Label>
+                            <Select
+                              value={waiver.approvedBy}
+                              onValueChange={(val) => {
+                                const updated = cpWaivers.map(w => w.id === waiver.id ? {...w, approvedBy: val} : w);
+                                setCpWaivers(updated);
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select approver" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Risk Committee">Risk Committee</SelectItem>
+                                <SelectItem value="InvestCo">InvestCo</SelectItem>
+                                <SelectItem value="BRIC">BRIC</SelectItem>
+                                <SelectItem value="Board">Board</SelectItem>
+                                <SelectItem value="Divisional Head">Divisional Head</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Approval Date</Label>
+                            <Input
+                              type="date"
+                              value={waiver.approvalDate}
+                              onChange={(e) => {
+                                const updated = cpWaivers.map(w => w.id === waiver.id ? {...w, approvalDate: e.target.value} : w);
+                                setCpWaivers(updated);
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Section 5: Departmental Clearances */}
             <Card>
               <CardHeader className="border-b border-primary/20">
                 <div className="flex items-center justify-between">
@@ -639,30 +1074,91 @@ const ClosingMemo = () => {
             {/* Action Buttons */}
             <Card>
               <CardContent className="pt-6">
-                <div className="flex flex-col md:flex-row gap-3">
-                  <Button 
-                    onClick={handleSaveDraft}
-                    variant="outline" 
-                    className="flex-1"
-                  >
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Draft
-                  </Button>
-                  <Button 
-                    onClick={handleSubmit}
-                    className="flex-1"
-                  >
-                    <Send className="mr-2 h-4 w-4" />
-                    Submit for EXCO Review
-                  </Button>
-                  <Button 
-                    onClick={handleDownloadPDF}
-                    variant="secondary" 
-                    className="flex-1"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Download PDF
-                  </Button>
+                <div className="flex flex-col gap-4">
+                  {/* Divisional Approval Section */}
+                  {approvalStatus === "draft" && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <UserCheck className="h-5 w-5 text-amber-600" />
+                        <h4 className="font-semibold text-amber-800">Step 1: Divisional Head Approval Required</h4>
+                      </div>
+                      <p className="text-sm text-amber-700 mb-3">
+                        The closing memo must be approved by {selectedApp?.divisionalHead} before submission to EXCO Secretary.
+                      </p>
+                      <Button onClick={handleSubmitToDivisional} className="bg-amber-600 hover:bg-amber-700">
+                        <Send className="mr-2 h-4 w-4" />
+                        Submit to Divisional Head
+                      </Button>
+                    </div>
+                  )}
+
+                  {approvalStatus === "pending-divisional" && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Clock className="h-5 w-5 text-amber-600" />
+                        <h4 className="font-semibold text-amber-800">Awaiting Divisional Head Approval</h4>
+                      </div>
+                      <p className="text-sm text-amber-700 mb-3">
+                        Submitted to {selectedApp?.divisionalHead} for review and approval.
+                      </p>
+                      {/* For demo purposes, allow simulating approval */}
+                      <Button onClick={handleDivisionalApproval} variant="outline" className="border-amber-500 text-amber-700 hover:bg-amber-100">
+                        <CheckCircle2 className="mr-2 h-4 w-4" />
+                        Simulate Divisional Approval
+                      </Button>
+                    </div>
+                  )}
+
+                  {approvalStatus === "divisional-approved" && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                        <h4 className="font-semibold text-green-800">Step 2: Ready for EXCO Secretary Submission</h4>
+                      </div>
+                      <div className="text-sm text-green-700 mb-3">
+                        <p>Approved by: <strong>{divisionalApprover}</strong></p>
+                        <p>Approval Date: <strong>{divisionalApprovalDate}</strong></p>
+                      </div>
+                      <Button onClick={handleSubmitToEXCO}>
+                        <Send className="mr-2 h-4 w-4" />
+                        Submit to EXCO Secretary
+                      </Button>
+                    </div>
+                  )}
+
+                  {approvalStatus === "pending-exco" && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Clock className="h-5 w-5 text-blue-600" />
+                        <h4 className="font-semibold text-blue-800">Pending EXCO Approval</h4>
+                      </div>
+                      <p className="text-sm text-blue-700">
+                        The closing memo has been submitted to the EXCO Secretary and is awaiting EXCO approval to proceed to disbursement.
+                      </p>
+                    </div>
+                  )}
+
+                  <Separator />
+
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <Button 
+                      onClick={handleSaveDraft}
+                      variant="outline" 
+                      className="flex-1"
+                      disabled={approvalStatus !== "draft"}
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Draft
+                    </Button>
+                    <Button 
+                      onClick={handleDownloadPDF}
+                      variant="secondary" 
+                      className="flex-1"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download PDF
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

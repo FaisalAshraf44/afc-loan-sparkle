@@ -21,7 +21,7 @@ import {
   Database,
   Megaphone
 } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 import {
@@ -145,6 +145,7 @@ const navigationGroups = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
   const [selectedDepartment, setSelectedDepartment] = useState<Department>("all");
 
@@ -153,6 +154,19 @@ export function AppSidebar() {
   const filteredGroups = selectedDepartment === "all" 
     ? navigationGroups 
     : navigationGroups.filter(group => group.department === selectedDepartment);
+
+  const handleDepartmentChange = (dept: Department) => {
+    setSelectedDepartment(dept);
+    
+    // Navigate to the first page of the selected department
+    const targetGroups = dept === "all" 
+      ? navigationGroups 
+      : navigationGroups.filter(group => group.department === dept);
+    
+    if (targetGroups.length > 0 && targetGroups[0].items.length > 0) {
+      navigate(targetGroups[0].items[0].url);
+    }
+  };
 
   const currentDeptConfig = departmentConfig[selectedDepartment];
   const DeptIcon = currentDeptConfig.icon;
@@ -188,7 +202,7 @@ export function AppSidebar() {
                 return (
                   <DropdownMenuItem 
                     key={key}
-                    onClick={() => setSelectedDepartment(key)}
+                    onClick={() => handleDepartmentChange(key)}
                     className={selectedDepartment === key ? "bg-muted" : ""}
                   >
                     <Icon className={`h-4 w-4 mr-2 ${config.color}`} />

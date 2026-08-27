@@ -125,7 +125,7 @@ const Dashboard = () => {
               <p className="text-sm text-muted-foreground">
                 Developed by <span className="font-semibold text-foreground">Insyt</span>
               </p>
-              <img src="/src/assets/insyt-logo.png" alt="Insyt Logo" className="h-6 w-auto" />
+              <img src="/public/insyt-logo.png" alt="Insyt Logo" className="h-6 w-auto" />
             </div>
           </footer>
         </div>

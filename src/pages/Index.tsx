@@ -13,6 +13,7 @@ import {
   CheckCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import insytLogo from "@/assets/insyt-logo.png";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const Index = () => {
@@ -248,7 +249,7 @@ const Index = () => {
           <p className="text-sm text-muted-foreground">
             Developed by <span className="font-semibold text-foreground">Insyt</span>
           </p>
-          <img src="/src/assets/insyt-logo.png" alt="Insyt Logo" className="h-6 w-auto" />
+          <img src={insytLogo} alt="Insyt Logo" className="h-6 w-auto" />
         </div>
       </footer>
     </div>

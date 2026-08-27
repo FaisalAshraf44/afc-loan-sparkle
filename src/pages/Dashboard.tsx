@@ -10,6 +10,7 @@ import {
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
+import insytLogo from "@/assets/insyt-logo.png";
 
 const Dashboard = () => {
   const location = useLocation();
@@ -125,7 +126,7 @@ const Dashboard = () => {
               <p className="text-sm text-muted-foreground">
                 Developed by <span className="font-semibold text-foreground">Insyt</span>
               </p>
-              <img src="/public/insyt-logo.png" alt="Insyt Logo" className="h-6 w-auto"/>
+              <img src={insytLogo} alt="Insyt Logo" className="h-6 w-auto"/>
             </div>
           </footer>
         </div>

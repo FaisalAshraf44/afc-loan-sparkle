@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { FileText, Download, Upload, Send, Clock, AlertTriangle, CheckCircle, Calendar } from "lucide-react";
 import { differenceInBusinessDays, format, addBusinessDays } from "date-fns";
+import ImpactAnnex from "@/components/ImpactAnnex";
 
 const eimDrafts = [
   { id: 1, company: "Tech Solutions Ltd", status: "approved", updatedAt: "2024-01-15", subInvestCoDate: "2024-01-22", submittedDate: "2024-01-15" },
@@ -61,6 +62,13 @@ const EIM = () => {
         <p className="text-muted-foreground">Template-based EIM document editor</p>
       </div>
 
+      <Tabs defaultValue="eim" className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="eim">EIM</TabsTrigger>
+          <TabsTrigger value="impact-annex">Impact Annex</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="eim">
       {/* 5-Day Deadline Alert */}
       <Card className="mb-6 p-4 border-warning/50 bg-warning/5">
         <div className="flex items-start gap-3">
@@ -269,6 +277,12 @@ const EIM = () => {
           </Card>
         </div>
       </div>
+        </TabsContent>
+
+        <TabsContent value="impact-annex">
+          <ImpactAnnex variant="final" />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

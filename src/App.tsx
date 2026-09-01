@@ -43,6 +43,11 @@ import Reports from "./pages/dashboard/disbursement/Reports";
 import EXCOApproval from "./pages/dashboard/disbursement/EXCOApproval";
 import SAPIntegration from "./pages/dashboard/disbursement/SAPIntegration";
 import InvestmentDisclosure from "./pages/dashboard/disbursement/InvestmentDisclosure";
+import ImpactAnnexPage from "./pages/dashboard/impact/ImpactAnnex";
+import DIReportForm from "./pages/dashboard/impact/DIReportForm";
+import InvesteePortal from "./pages/dashboard/impact/InvesteePortal";
+import ImpactDashboard from "./pages/dashboard/impact/ImpactDashboard";
+import JIMExport from "./pages/dashboard/impact/JIMExport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -90,6 +95,11 @@ const App = () => (
             <Route path="disbursement/investment-disclosure" element={<InvestmentDisclosure />} />
             <Route path="disbursement/portfolio" element={<Portfolio />} />
             <Route path="disbursement/reports" element={<Reports />} />
+            <Route path="impact/annex" element={<ImpactAnnexPage />} />
+            <Route path="impact/di-report" element={<DIReportForm />} />
+            <Route path="impact/investee-portal" element={<InvesteePortal />} />
+            <Route path="impact/dashboard" element={<ImpactDashboard />} />
+            <Route path="impact/jim-export" element={<JIMExport />} />
             <Route path="admin/users" element={<Users />} />
             <Route path="admin/roles" element={<Roles />} />
             <Route path="admin/notifications" element={<Notifications />} />

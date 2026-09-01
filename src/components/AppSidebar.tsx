@@ -19,7 +19,10 @@ import {
   Building2,
   ChevronDown,
   Database,
-  Megaphone
+  Megaphone,
+  Sparkles,
+  Target,
+  Globe
 } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -43,7 +46,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type Department = "all" | "origination" | "risk" | "legal" | "treasury" | "admin";
+type Department = "all" | "origination" | "risk" | "legal" | "treasury" | "impact" | "admin";
 
 interface DepartmentConfig {
   label: string;
@@ -57,6 +60,7 @@ const departmentConfig: Record<Department, DepartmentConfig> = {
   risk: { label: "Risk & Analysis", icon: BarChart3, color: "text-amber-500" },
   legal: { label: "Legal", icon: Shield, color: "text-purple-500" },
   treasury: { label: "Treasury", icon: DollarSign, color: "text-emerald-500" },
+  impact: { label: "Impact", icon: Sparkles, color: "text-teal-500" },
   admin: { label: "Admin", icon: UserCog, color: "text-rose-500" },
 };
 
@@ -97,6 +101,17 @@ const navigationGroups = [
       { title: "Board Approval", url: "/dashboard/approval/board", icon: Gavel },
       { title: "Approval Communication", url: "/dashboard/approval/communication", icon: Send },
       { title: "Approval Tracking", url: "/dashboard/approval/tracking", icon: Activity },
+    ],
+  },
+  {
+    label: "Impact Management",
+    department: "impact" as Department,
+    items: [
+      { title: "Impact Annex", url: "/dashboard/impact/annex", icon: Target },
+      { title: "DI Report Forms", url: "/dashboard/impact/di-report", icon: ClipboardList },
+      { title: "Investee Portal", url: "/dashboard/impact/investee-portal", icon: Globe },
+      { title: "Impact Dashboard", url: "/dashboard/impact/dashboard", icon: BarChart3 },
+      { title: "JIM Export", url: "/dashboard/impact/jim-export", icon: FileOutput },
     ],
   },
   {

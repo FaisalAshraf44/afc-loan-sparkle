@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Save, Send, Download } from "lucide-react";
+import { FileText, Save, Send, Download, Target } from "lucide-react";
+import ImpactAnnex from "@/components/ImpactAnnex";
 
 const IDMemo = () => {
   const { toast } = useToast();
@@ -167,6 +168,22 @@ const IDMemo = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Preliminary Impact Radar */}
+      <Card className="mt-6">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Target className="h-5 w-5 text-primary" />
+            <CardTitle>Preliminary Impact Radar</CardTitle>
+          </div>
+          <CardDescription>
+            The Impact Annex starts at the ID Memo and is refined at EIM, FIM and BRIC.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ImpactAnnex variant="preliminary" />
+        </CardContent>
+      </Card>
     </div>
   );
 };

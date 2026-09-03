@@ -22,7 +22,8 @@ import {
   Megaphone,
   Sparkles,
   Target,
-  Globe
+  Globe,
+  Pencil
 } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -107,6 +108,7 @@ const navigationGroups = [
     label: "Impact Management",
     department: "impact" as Department,
     items: [
+      { title: "Impact Input", url: "/dashboard/impact/input", icon: Pencil },
       { title: "Impact Annex", url: "/dashboard/impact/annex", icon: Target },
       { title: "DI Report Forms", url: "/dashboard/impact/di-report", icon: ClipboardList },
       { title: "Investee Portal", url: "/dashboard/impact/investee-portal", icon: Globe },

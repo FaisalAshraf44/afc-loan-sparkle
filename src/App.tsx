@@ -43,6 +43,7 @@ import Reports from "./pages/dashboard/disbursement/Reports";
 import EXCOApproval from "./pages/dashboard/disbursement/EXCOApproval";
 import SAPIntegration from "./pages/dashboard/disbursement/SAPIntegration";
 import InvestmentDisclosure from "./pages/dashboard/disbursement/InvestmentDisclosure";
+import ImpactInput from "./pages/dashboard/impact/ImpactInput";
 import ImpactAnnexPage from "./pages/dashboard/impact/ImpactAnnex";
 import DIReportForm from "./pages/dashboard/impact/DIReportForm";
 import InvesteePortal from "./pages/dashboard/impact/InvesteePortal";
@@ -95,6 +96,7 @@ const App = () => (
             <Route path="disbursement/investment-disclosure" element={<InvestmentDisclosure />} />
             <Route path="disbursement/portfolio" element={<Portfolio />} />
             <Route path="disbursement/reports" element={<Reports />} />
+            <Route path="impact/input" element={<ImpactInput />} />
             <Route path="impact/annex" element={<ImpactAnnexPage />} />
             <Route path="impact/di-report" element={<DIReportForm />} />
             <Route path="impact/investee-portal" element={<InvesteePortal />} />
